@@ -9,6 +9,8 @@ var VTAugment = /** @class */ (function () {
         this._options = _options;
         console.log('VT AUGMENT', 'constructor', _container, _options);
         createStyleSheet(true);
+        _container.classList.add("vt-augment-drawer-" + CSS_SCOPE);
+        getIframe(_container);
     }
     VTAugment.factory = function (container, options) {
         if (container === void 0) { container = null; }
@@ -62,16 +64,16 @@ function getIframe(container) {
         _iframe.style.width = '100%';
         _iframe.style.height = '100%';
         _iframe.setAttribute('frameborder', '0');
-        this._container.appendChild(_iframe);
+        container.appendChild(_iframe);
     }
     return _iframe;
 }
 function getSpinner(container) {
-    var _spinner = container.querySelector('div.spinner');
+    var _spinner = container.querySelector("div.spinner-" + CSS_SCOPE);
     if (!_spinner) {
         _spinner = document.createElement('div');
         _spinner.classList.add("spinner-" + CSS_SCOPE);
-        this._container.appendChild(_spinner);
+        container.appendChild(_spinner);
     }
     return _spinner;
 }

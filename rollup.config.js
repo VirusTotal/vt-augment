@@ -8,7 +8,7 @@ export default {
         {
             file: "dist/bundle/vt-augment.js",
             format: "umd",
-            name: "vt-augment",
+            name: "vtaugment",
             exports: "default",
             sourcemap: true
         }
