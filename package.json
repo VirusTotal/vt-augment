@@ -1,19 +1,19 @@
 {
     "name": "@virustotal/vt-augment",
     "version": "1.0.0",
-    "description": "",
+    "description": "Client library that wraps common patterns when interact with the Virustotal Augment product",
     "keywords": [
         "virustotal",
         "malware",
         "vt-augment"
     ],
-    "homepage": "",
+    "homepage": "https://github.com/VirusTotal/vt-augment",
     "repository": {
         "type": "git",
-        "url": ""
+        "url": "https://github.com/VirusTotal/vt-augment"
     },
     "bugs": {
-        "url": ""
+        "url": "https://github.com/VirusTotal/vt-augment/issues"
     },
     "main": "./dist/bundle/vt-augment.js",
     "module": "./dist/index.js",
