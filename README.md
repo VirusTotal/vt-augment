@@ -96,7 +96,7 @@ Loads the VT API url into the iframe.
 ```js
 vtaugment(container).url("...")
 
-// Additionally, if the mode is `drawer` can be used along the method `openDrawer`
+// Additionally, if the mode is `drawer` can be used along with the method `openDrawer`
 
 vtaugment(container).url("...").openDrawer()
 
