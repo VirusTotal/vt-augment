@@ -78,7 +78,13 @@ vtaugment(container, options)
 
 ## Modes
 
-TODO drawer vs embedded
+#### Drawer
+
+TODO
+
+#### Embedded
+
+TODO
 
 # API
 
@@ -108,7 +114,7 @@ vtaugment(container).url("...").openDrawer()
 
 #### openDrawer()
 
-Open a drawer panel from the right side. (Only works in `drawer` mode)
+Open a drawer panel from the right side. (Only works in [drawer](#drawer) mode)
 
 ```js
 vtaugment(container).openDrawer()
@@ -117,7 +123,7 @@ vtaugment(container).openDrawer()
 
 #### closeDrawer()
 
-Close the drawer panel. (Only works in `drawer` mode)
+Close the drawer panel. (Only works in [drawer](#drawer) mode)
 
 ```js
 vtaugment(container).closeDrawer()
@@ -135,7 +141,7 @@ vtaugment(container).listen("...", callback)
 
 #### loading(active: boolean)
 
-The loading state in managed internally by the library but in the case of need the api provide this method to control loading manually. (Active loading hide the content)
+The loading state in managed internally by the library but in the case of need the api provides this method to control loading manually. (Active loading hide the content)
 
 ```js
 vtaugment(container).loading(true)
