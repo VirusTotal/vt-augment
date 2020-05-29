@@ -142,6 +142,10 @@ vtaugment(container).loading(true)
 
 ```
 
+## Options
+
+TODO
+
 # License
 
 TODO
