@@ -141,7 +141,7 @@ vtaugment(container).listen("...", callback)
 
 #### loading(active: boolean)
 
-The loading state in managed internally by the library but in the case of need the api provides this method to control loading manually. (Active loading hide the content)
+The loading state is managed internally by the library but in the case of need the api provides this method to control loading manually. (Active loading hide the content)
 
 ```js
 vtaugment(container).loading(true)
