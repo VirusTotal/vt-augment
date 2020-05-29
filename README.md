@@ -4,7 +4,7 @@
 </h1>
 
 <h4 align="center">
-	Client library that wraps common patterns when interact with the [VirusTotal Augment product](https://developers.virustotal.com/v3.0/reference?#widget-overview).
+	Client library that wraps common patterns when interact with the <a href="https://developers.virustotal.com/v3.0/reference?#widget-overview">VirusTotal Augment product<a>.
 </h4>
 
 <br>
@@ -22,7 +22,7 @@
 ## Npm
 
 ```sh
-npm i vt-augment
+npm i @virustotal/vt-augment
 ```
 
 ## Clone
