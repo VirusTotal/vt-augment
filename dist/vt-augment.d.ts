@@ -1,5 +1,5 @@
 export declare type VTAugmentOptions = {
-    mode?: string;
+    mode?: 'drawer' | 'embedded';
 };
 export declare class VTAugment {
     _container: HTMLElement;

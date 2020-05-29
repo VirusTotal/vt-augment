@@ -1,5 +1,5 @@
 export type VTAugmentOptions = {
-  mode?: string,
+  mode?: 'drawer' | 'embedded',
 }
 
 const CSS_SCOPE = '4rrgf4';
@@ -25,7 +25,6 @@ const CSS_STYLESHEET = `
     transform: translateX(100vw);
   }
   .vt-augment-${CSS_SCOPE}.drawer[opened] {
-    display: block;
     animation: slideFromRight-${CSS_SCOPE} 0.2s 1 forwards;
   }
   .vt-augment-${CSS_SCOPE} > .spinner {
@@ -64,9 +63,15 @@ export class VTAugment {
         getIframe(_container);
 
         _container.classList.add(`vt-augment-${CSS_SCOPE}`);
-        if (_options.mode === 'drawer') {
+        // if (_options.mode === 'drawer') {
           _container.classList.add('drawer');
-        }
+        // }
+
+          document.body.addEventListener('click', e => {
+          if (e.target !== _container) {
+            this.closeDrawer();
+          }
+        });
       }
 
     static factory(container: HTMLElement = null, options: VTAugmentOptions = {}) { return new VTAugment(container, options) }

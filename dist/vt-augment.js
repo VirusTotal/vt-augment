@@ -1,15 +1,21 @@
 var CSS_SCOPE = '4rrgf4';
-var CSS_STYLESHEET = "\n  .vt-augment-" + CSS_SCOPE + " {\n    display: flex;\n    justify-content: center;\n    align-items: center;\n  }\n  .vt-augment-" + CSS_SCOPE + ".drawer {\n    width: 700px;\n    background: #313d5a;\n    border: 1px solid #e6e6e6;\n    text-align: left;\n    z-index: 102;\n    position: fixed;\n    right: 0;\n    top: 0;\n    height: 100vh;\n    box-shadow: -4px 5px 8px -3px rgba(17, 17, 17, .16);\n    animation: slideToRight-" + CSS_SCOPE + " 0.5s 1 forwards;\n    transform: translateX(100vw);\n  }\n  .vt-augment-" + CSS_SCOPE + ".drawer[opened] {\n    display: block;\n    animation: slideFromRight-" + CSS_SCOPE + " 0.2s 1 forwards;\n  }\n  .vt-augment-" + CSS_SCOPE + " > .spinner {\n    border: 8px solid rgba(0, 0, 0, 0.2);\n    border-left-color: white;\n    border-radius: 50%;\n    width: 50px;\n    height: 50px;\n    animation: spin-" + CSS_SCOPE + " 1.2s linear infinite;\n  }\n  @keyframes spin-" + CSS_SCOPE + " {\n    to { transform: rotate(360deg); }\n  }\n  @keyframes slideFromRight-" + CSS_SCOPE + " {\n    0% {\n      transform: translateX(100vw);\n    }\n    100% {\n      transform: translateX(0);\n    }\n  }\n  @keyframes slideToRight-" + CSS_SCOPE + " {\n    100% {\n      transform: translateX(100vw);\n      display: none;\n    }\n  }\n";
+var CSS_STYLESHEET = "\n  .vt-augment-" + CSS_SCOPE + " {\n    display: flex;\n    justify-content: center;\n    align-items: center;\n  }\n  .vt-augment-" + CSS_SCOPE + ".drawer {\n    width: 700px;\n    background: #313d5a;\n    border: 1px solid #e6e6e6;\n    text-align: left;\n    z-index: 102;\n    position: fixed;\n    right: 0;\n    top: 0;\n    height: 100vh;\n    box-shadow: -4px 5px 8px -3px rgba(17, 17, 17, .16);\n    animation: slideToRight-" + CSS_SCOPE + " 0.5s 1 forwards;\n    transform: translateX(100vw);\n  }\n  .vt-augment-" + CSS_SCOPE + ".drawer[opened] {\n    animation: slideFromRight-" + CSS_SCOPE + " 0.2s 1 forwards;\n  }\n  .vt-augment-" + CSS_SCOPE + " > .spinner {\n    border: 8px solid rgba(0, 0, 0, 0.2);\n    border-left-color: white;\n    border-radius: 50%;\n    width: 50px;\n    height: 50px;\n    animation: spin-" + CSS_SCOPE + " 1.2s linear infinite;\n  }\n  @keyframes spin-" + CSS_SCOPE + " {\n    to { transform: rotate(360deg); }\n  }\n  @keyframes slideFromRight-" + CSS_SCOPE + " {\n    0% {\n      transform: translateX(100vw);\n    }\n    100% {\n      transform: translateX(0);\n    }\n  }\n  @keyframes slideToRight-" + CSS_SCOPE + " {\n    100% {\n      transform: translateX(100vw);\n      display: none;\n    }\n  }\n";
 var VTAugment = /** @class */ (function () {
     function VTAugment(_container, _options) {
+        var _this = this;
         this._container = _container;
         this._options = _options;
         createStyleSheet();
         getIframe(_container);
         _container.classList.add("vt-augment-" + CSS_SCOPE);
-        if (_options.mode === 'drawer') {
-            _container.classList.add('drawer');
-        }
+        // if (_options.mode === 'drawer') {
+        _container.classList.add('drawer');
+        // }
+        document.body.addEventListener('click', function (e) {
+            if (e.target !== _container) {
+                _this.closeDrawer();
+            }
+        });
     }
     VTAugment.factory = function (container, options) {
         if (container === void 0) { container = null; }
