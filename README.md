@@ -7,6 +7,10 @@
 	Client library that wraps common patterns when interact with the <a href="https://developers.virustotal.com/v3.0/reference?#widget-overview">VirusTotal Augment product<a>.
 </h4>
 
+<h4 align="center">
+	<a href="https://virustotal.com/ui/widget/demo/dedicated">Go to demo<a>
+</h4>
+
 <br>
 
 # Table of Contents
