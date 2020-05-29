@@ -55,7 +55,7 @@ VT Augment is compatible with all modern browsers and IE11.
 <script src="dist/bundle/vt-augment.js"></script>
 ```
 
-```typescript
+```javascript
 // es2015 modules
 import vtaugment from "vtaugment"
 
@@ -66,14 +66,13 @@ var vtaugment = require("vtaugment")
 ## Code
 ```html
 <div id="vt-augment-container"></div>
-´´´
+```
 
 ```javascript
 const container = document.querySelector('#vt-augment-container');
 
 vtaugment(container, options)
   .url("...")
-
 ```
 
 ## Modes
