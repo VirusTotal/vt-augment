@@ -1,5 +1,5 @@
 <h1 align="center">
-    <a href="https://github.com/VirusTotal/vt-augment">VT Augment</a><br>
+    <a href="https://github.com/VirusTotal/vt-augment"><img alt="VT Augment logo" src="https://raw.github.com/VirusTotal/vt-augment/master/vtaugment.svg"></a><br>
 	<br>
 </h1>
 
