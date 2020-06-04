@@ -14,10 +14,8 @@
 
 'use strict';
 
-// sample-metadata:
-//   title: Upload a directory to a bucket.
-//   description: Uploads full hierarchy of a local directory to a bucket.
-//   usage: node files.js upload-directory <bucketName> <directoryPath>
+const argv = require('minimist')(process.argv.slice(2));
+const pjson = require('./package.json');
 
 async function main(bucketName, bucketPrefix, directoryPath) {
   // [START upload_directory]
@@ -64,10 +62,11 @@ async function main(bucketName, bucketPrefix, directoryPath) {
       const resp = await Promise.all(
         fileList.map(filePath => {
           let destination = path.relative(pathDirName, filePath);
+          destination = bucketPrefix + destination.replace('dist/', '');
 
           return storage
             .bucket(bucketName)
-            .upload(filePath, {destination: bucketPrefix + destination})
+            .upload(filePath, {destination: destination})
             .then(
               uploadResp => ({fileName: destination, status: uploadResp[0]}),
               err => ({fileName: destination, response: err})
@@ -87,5 +86,16 @@ async function main(bucketName, bucketPrefix, directoryPath) {
   // [END upload_directory]
 }
 
-//main(...process.argv.slice(2)).catch(console.error);
-main('vtaugment', '1.0.0/', 'dist').catch(console.error);
+function getBucketPrefix() {
+  let prefix = 'dev';
+
+  if (argv.v) {
+    prefix = argv.v;
+  } else if (argv.p) {
+    prefix = pjson.version;
+  }
+
+  return prefix + '/';
+}
+
+main('vtaugment', getBucketPrefix(), 'dist').catch(console.error);

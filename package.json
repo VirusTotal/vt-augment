@@ -38,6 +38,7 @@
         "@types/jest": "^25.2.1",
         "@types/node": "^13.11.0",
         "concurrently": "^5.1.0",
+        "minimist": "^1.2.5",
         "jest": "^25.2.7",
         "rimraf": "^3.0.2",
         "rollup": "^2.3.3",
