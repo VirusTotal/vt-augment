@@ -94,19 +94,28 @@ Creates a new object with a html element and a set of options. An iframe is dyna
 
 *Methods can be chained and can be called in whatever order.*
 
-| [url](#urlurl-string) | [openDrawer](#opendrawer) | [closeDrawer](#closedrawer) | [listen](#listenevent-string-callback-any) | [loading](#loading(active-boolean))
-|-----|-----|-----|-----|-----|
+| [load](#loadurl-string) | [preload](#preloadurl-string) | [openDrawer](#opendrawer) | [closeDrawer](#closedrawer) | [listen](#listenevent-string-callback-any) | [loading](#loading(active-boolean))
+|-----|-----|-----|-----|-----|-----|
 
-#### url(url: string)
+#### load(url: string)
 
 Loads the VT API url into the iframe.
 
 ```js
-vtaugment(container).url("...")
+vtaugment(container).load("...")
 
 // Additionally, if the mode is `drawer` can be used along with the method `openDrawer`
 
-vtaugment(container).url("...").openDrawer()
+vtaugment(container).load("...").openDrawer()
+
+```
+
+#### preload(url: string)
+
+Load the html and cache it ready to show the content as soon as you call the `load` method. Typically this method is used linked to a `mouseover` event in the link or the surrounded area of the link.
+
+```js
+vtaugment(container).preload("...")
 
 ```
 

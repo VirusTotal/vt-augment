@@ -1,3 +1,5 @@
+import lscache from 'lscache';
+
 export type VTAugmentOptions = {
   mode?: 'drawer' | 'embedded',
 }
@@ -67,25 +69,62 @@ export class VTAugment {
           _container.classList.add('drawer');
         // }
 
-          document.body.addEventListener('click', e => {
+        document.body.addEventListener('click', e => {
           if (e.target !== _container) {
             this.closeDrawer();
           }
         });
+
+        window.addEventListener('message', (event: any) => {
+        if (event.data === 'VTAUGMENT:READY') {
+          this.loading(false);
+        }
+      });
       }
 
     static factory(container: HTMLElement = null, options: VTAugmentOptions = {}) { return new VTAugment(container, options) }
 
-    url(url: string) {
-      this.loading(true);
+    load(url: string) {
       const _iframe = getIframe(this._container);
+      let html = lscache.get(url);
 
-      _iframe.onload = () => {
-        this.loading(false);
-      };
+      if (html) {
+        if (html === 'fetching') {
+          this.loading(true);
+          let count = 0;
+          const intervalRef = setInterval(() => {
+            count++;
 
-      _iframe.src = url;
+            html = lscache.get(url);
+
+            if (html && html !== 'fetching') {
+              _iframe.srcdoc = html;
+              clearInterval(intervalRef);
+            }
+
+            if (count === 8) {
+              _iframe.src = url;
+              clearInterval(intervalRef);
+            }
+          }, 250);
+        } else {
+          _iframe.srcdoc = html;
+        }
+      } else {
+        this.loading(true);
+        _iframe.src = url;
+      }
+
       return this;
+    }
+
+    preload(url: string) {
+      const html = lscache.get(url);
+
+      if (!html) {
+        lscache.set(url, 'fetching', 1);
+        getHtmlAjax(url);
+      }
     }
 
     openDrawer() {
@@ -142,4 +181,19 @@ function getSpinner(container: HTMLElement) {
   }
 
   return _spinner;
+}
+
+function getHtmlAjax(url) {
+  const xmlhr = new XMLHttpRequest();
+
+  xmlhr.onreadystatechange = function () {
+    if (xmlhr.readyState === XMLHttpRequest.DONE) {
+      if (xmlhr.status === 200) {
+        lscache.set(url, xmlhr.response, 60);
+      }
+    }
+  };
+
+  xmlhr.open("GET", url, true);
+  xmlhr.send();
 }

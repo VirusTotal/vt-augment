@@ -1,3 +1,4 @@
+import lscache from 'lscache';
 var CSS_SCOPE = '4rrgf4';
 var CSS_STYLESHEET = "\n  .vt-augment-" + CSS_SCOPE + " {\n    display: flex;\n    justify-content: center;\n    align-items: center;\n  }\n  .vt-augment-" + CSS_SCOPE + ".drawer {\n    width: 700px;\n    background: #313d5a;\n    border: 1px solid #e6e6e6;\n    text-align: left;\n    z-index: 102;\n    position: fixed;\n    right: 0;\n    top: 0;\n    height: 100vh;\n    box-shadow: -4px 5px 8px -3px rgba(17, 17, 17, .16);\n    animation: slideToRight-" + CSS_SCOPE + " 0.5s 1 forwards;\n    transform: translateX(100vw);\n  }\n  .vt-augment-" + CSS_SCOPE + ".drawer[opened] {\n    animation: slideFromRight-" + CSS_SCOPE + " 0.2s 1 forwards;\n  }\n  .vt-augment-" + CSS_SCOPE + " > .spinner {\n    border: 8px solid rgba(0, 0, 0, 0.2);\n    border-left-color: white;\n    border-radius: 50%;\n    width: 50px;\n    height: 50px;\n    animation: spin-" + CSS_SCOPE + " 1.2s linear infinite;\n  }\n  @keyframes spin-" + CSS_SCOPE + " {\n    to { transform: rotate(360deg); }\n  }\n  @keyframes slideFromRight-" + CSS_SCOPE + " {\n    0% {\n      transform: translateX(100vw);\n    }\n    100% {\n      transform: translateX(0);\n    }\n  }\n  @keyframes slideToRight-" + CSS_SCOPE + " {\n    100% {\n      transform: translateX(100vw);\n      display: none;\n    }\n  }\n";
 var VTAugment = /** @class */ (function () {
@@ -16,21 +17,53 @@ var VTAugment = /** @class */ (function () {
                 _this.closeDrawer();
             }
         });
+        window.addEventListener('message', function (event) {
+            if (event.data === 'VTAUGMENT:READY') {
+                _this.loading(false);
+            }
+        });
     }
     VTAugment.factory = function (container, options) {
         if (container === void 0) { container = null; }
         if (options === void 0) { options = {}; }
         return new VTAugment(container, options);
     };
-    VTAugment.prototype.url = function (url) {
-        var _this = this;
-        this.loading(true);
+    VTAugment.prototype.load = function (url) {
         var _iframe = getIframe(this._container);
-        _iframe.onload = function () {
-            _this.loading(false);
-        };
-        _iframe.src = url;
+        var html = lscache.get(url);
+        if (html) {
+            if (html === 'fetching') {
+                this.loading(true);
+                var count_1 = 0;
+                var intervalRef_1 = setInterval(function () {
+                    count_1++;
+                    html = lscache.get(url);
+                    if (html && html !== 'fetching') {
+                        _iframe.srcdoc = html;
+                        clearInterval(intervalRef_1);
+                    }
+                    if (count_1 === 8) {
+                        _iframe.src = url;
+                        clearInterval(intervalRef_1);
+                    }
+                }, 250);
+            }
+            else {
+                _iframe.srcdoc = html;
+            }
+        }
+        else {
+            this.loading(true);
+            _iframe.src = url;
+        }
         return this;
+    };
+    VTAugment.prototype.preload = function (url) {
+        var html = lscache.get(url);
+        if (!html) {
+            lscache.set(url, 'fetching', 1);
+            getHtmlAjax(url);
+        }
     };
     VTAugment.prototype.openDrawer = function () {
         this._container.setAttribute('opened', '');
@@ -78,5 +111,17 @@ function getSpinner(container) {
         container.appendChild(_spinner);
     }
     return _spinner;
+}
+function getHtmlAjax(url) {
+    var xmlhr = new XMLHttpRequest();
+    xmlhr.onreadystatechange = function () {
+        if (xmlhr.readyState === XMLHttpRequest.DONE) {
+            if (xmlhr.status === 200) {
+                lscache.set(url, xmlhr.response, 60);
+            }
+        }
+    };
+    xmlhr.open("GET", url, true);
+    xmlhr.send();
 }
 //# sourceMappingURL=vt-augment.js.map
