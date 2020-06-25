@@ -99,6 +99,7 @@ export class VTAugment {
 
             if (html && html !== 'fetching') {
               _iframe.srcdoc = html;
+              this.loading(false);
               clearInterval(intervalRef);
             }
 
