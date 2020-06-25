@@ -29,6 +29,7 @@ var VTAugment = /** @class */ (function () {
         return new VTAugment(container, options);
     };
     VTAugment.prototype.load = function (url) {
+        var _this = this;
         var _iframe = getIframe(this._container);
         var html = lscache.get(url);
         if (html) {
@@ -40,6 +41,7 @@ var VTAugment = /** @class */ (function () {
                     html = lscache.get(url);
                     if (html && html !== 'fetching') {
                         _iframe.srcdoc = html;
+                        _this.loading(false);
                         clearInterval(intervalRef_1);
                     }
                     if (count_1 === 8) {
