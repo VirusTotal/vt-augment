@@ -31,24 +31,26 @@ var VTAugment = /** @class */ (function () {
     VTAugment.prototype.load = function (url) {
         var _this = this;
         var _iframe = getIframe(this._container);
+        if (_iframe.srcdoc === undefined) {
+            this.loading(true);
+            _iframe.src = url;
+            return this;
+        }
         var html = lscache.get(url);
         if (html) {
             if (html === 'fetching') {
                 this.loading(true);
-                var count_1 = 0;
                 var intervalRef_1 = setInterval(function () {
-                    count_1++;
                     html = lscache.get(url);
                     if (html && html !== 'fetching') {
                         _iframe.srcdoc = html;
                         _this.loading(false);
                         clearInterval(intervalRef_1);
                     }
-                    if (count_1 === 8) {
+                    else if (html === null) {
                         _iframe.src = url;
-                        clearInterval(intervalRef_1);
                     }
-                }, 250);
+                }, 333);
             }
             else {
                 _iframe.srcdoc = html;
@@ -61,6 +63,11 @@ var VTAugment = /** @class */ (function () {
         return this;
     };
     VTAugment.prototype.preload = function (url) {
+        var _iframe = getIframe(this._container);
+        // Avoid caching if browser doesn't support iframe content injection
+        if (_iframe.srcdoc === undefined) {
+            return;
+        }
         var html = lscache.get(url);
         if (!html) {
             lscache.set(url, 'fetching', 1);
@@ -120,6 +127,9 @@ function getHtmlAjax(url) {
         if (xmlhr.readyState === XMLHttpRequest.DONE) {
             if (xmlhr.status === 200) {
                 lscache.set(url, xmlhr.response, 60);
+            }
+            else {
+                lscache.remove(url);
             }
         }
     };

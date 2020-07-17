@@ -86,28 +86,29 @@ export class VTAugment {
 
     load(url: string) {
       const _iframe = getIframe(this._container);
+
+      if (_iframe.srcdoc === undefined) {
+        this.loading(true);
+        _iframe.src = url;
+        return this;
+      }
+
       let html = lscache.get(url);
 
       if (html) {
         if (html === 'fetching') {
           this.loading(true);
-          let count = 0;
           const intervalRef = setInterval(() => {
-            count++;
-
             html = lscache.get(url);
 
             if (html && html !== 'fetching') {
               _iframe.srcdoc = html;
               this.loading(false);
               clearInterval(intervalRef);
-            }
-
-            if (count === 8) {
+            } else if (html === null) {
               _iframe.src = url;
-              clearInterval(intervalRef);
             }
-          }, 250);
+          }, 333);
         } else {
           _iframe.srcdoc = html;
         }
@@ -120,6 +121,13 @@ export class VTAugment {
     }
 
     preload(url: string) {
+      const _iframe = getIframe(this._container);
+
+      // Avoid caching if browser doesn't support iframe content injection
+      if (_iframe.srcdoc === undefined) {
+        return;
+      }
+
       const html = lscache.get(url);
 
       if (!html) {
@@ -191,6 +199,8 @@ function getHtmlAjax(url) {
     if (xmlhr.readyState === XMLHttpRequest.DONE) {
       if (xmlhr.status === 200) {
         lscache.set(url, xmlhr.response, 60);
+      } else {
+        lscache.remove(url);
       }
     }
   };
