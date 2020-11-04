@@ -1,4 +1,5 @@
 import lscache from 'lscache';
+var POLLING_TIMEOUT = 5 * 1000;
 var CSS_SCOPE = '4rrgf4';
 var CSS_STYLESHEET = "\n  .vt-augment-" + CSS_SCOPE + " {\n    display: flex;\n    justify-content: center;\n    align-items: center;\n  }\n  .vt-augment-" + CSS_SCOPE + ".drawer {\n    width: 700px;\n    background: #313d5a;\n    border: 1px solid #e6e6e6;\n    text-align: left;\n    z-index: 102;\n    position: fixed;\n    right: 0;\n    top: 0;\n    height: 100vh;\n    box-shadow: -4px 5px 8px -3px rgba(17, 17, 17, .16);\n    animation: slideToRight-" + CSS_SCOPE + " 0.5s 1 forwards;\n    transform: translateX(100vw);\n  }\n  .vt-augment-" + CSS_SCOPE + ".drawer[opened] {\n    animation: slideFromRight-" + CSS_SCOPE + " 0.2s 1 forwards;\n  }\n  .vt-augment-" + CSS_SCOPE + " > .spinner {\n    border: 8px solid rgba(0, 0, 0, 0.2);\n    border-left-color: white;\n    border-radius: 50%;\n    width: 50px;\n    height: 50px;\n    animation: spin-" + CSS_SCOPE + " 1.2s linear infinite;\n  }\n  @keyframes spin-" + CSS_SCOPE + " {\n    to { transform: rotate(360deg); }\n  }\n  @keyframes slideFromRight-" + CSS_SCOPE + " {\n    0% {\n      transform: translateX(100vw);\n    }\n    100% {\n      transform: translateX(0);\n    }\n  }\n  @keyframes slideToRight-" + CSS_SCOPE + " {\n    100% {\n      transform: translateX(100vw);\n      display: none;\n    }\n  }\n";
 var VTAugment = /** @class */ (function () {
@@ -31,34 +32,42 @@ var VTAugment = /** @class */ (function () {
     VTAugment.prototype.load = function (url) {
         var _this = this;
         var _iframe = getIframe(this._container);
+        // iframe html injection not supported, trigger traditional url load
         if (_iframe.srcdoc === undefined) {
             this.loading(true);
             _iframe.src = url;
             return this;
         }
         var html = lscache.get(url);
-        if (html) {
-            if (html === 'fetching') {
-                this.loading(true);
-                var intervalRef_1 = setInterval(function () {
-                    html = lscache.get(url);
-                    if (html && html !== 'fetching') {
-                        _iframe.srcdoc = html;
-                        _this.loading(false);
-                        clearInterval(intervalRef_1);
-                    }
-                    else if (html === null) {
-                        _iframe.src = url;
-                    }
-                }, 333);
-            }
-            else {
-                _iframe.srcdoc = html;
-            }
-        }
-        else {
+        // html not found in cache neither in fetching process, trigger traditional url load
+        if (!html) {
             this.loading(true);
             _iframe.src = url;
+            return this;
+        }
+        // html is ready for the iframe injection
+        if (html !== 'fetching') {
+            _iframe.srcdoc = html;
+            return this;
+        }
+        // html is still fetching so polling until is ready or timeout
+        if (html === 'fetching') {
+            this.loading(true);
+            var intervalRef_1 = setInterval(function () {
+                html = lscache.get(url);
+                if (html && html !== 'fetching') {
+                    clearInterval(intervalRef_1);
+                    _iframe.srcdoc = html;
+                    _this.loading(false);
+                }
+                else if (html === null) {
+                    _iframe.src = url;
+                }
+            }, POLLING_TIMEOUT);
+            setTimeout(function () {
+                clearInterval(intervalRef_1);
+                _iframe.src = url;
+            }, POLLING_TIMEOUT);
         }
         return this;
     };

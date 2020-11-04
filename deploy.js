@@ -68,8 +68,14 @@ async function main(bucketName, bucketPrefix, directoryPath) {
             .bucket(bucketName)
             .upload(filePath, {destination: destination})
             .then(
-              uploadResp => ({fileName: destination, status: uploadResp[0]}),
-              err => ({fileName: destination, response: err})
+              uploadResp => {
+                console.log(uploadResp[0]);
+                return {fileName: destination, status: uploadResp[0]};
+              },
+              err => {
+                console.error(err);
+                return {fileName: destination, response: err};
+              }
             );
         })
       );
