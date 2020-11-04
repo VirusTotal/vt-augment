@@ -4,6 +4,8 @@ export type VTAugmentOptions = {
   mode?: 'drawer' | 'embedded',
 }
 
+const POLLING_TIMEOUT = 5 * 1000;
+
 const CSS_SCOPE = '4rrgf4';
 
 const CSS_STYLESHEET = `
@@ -54,7 +56,7 @@ const CSS_STYLESHEET = `
       display: none;
     }
   }
-`
+`;
 
 export class VTAugment {
 
@@ -87,6 +89,7 @@ export class VTAugment {
     load(url: string) {
       const _iframe = getIframe(this._container);
 
+      // iframe html injection not supported, trigger traditional url load
       if (_iframe.srcdoc === undefined) {
         this.loading(true);
         _iframe.src = url;
@@ -95,26 +98,38 @@ export class VTAugment {
 
       let html = lscache.get(url);
 
-      if (html) {
-        if (html === 'fetching') {
-          this.loading(true);
-          const intervalRef = setInterval(() => {
-            html = lscache.get(url);
-
-            if (html && html !== 'fetching') {
-              _iframe.srcdoc = html;
-              this.loading(false);
-              clearInterval(intervalRef);
-            } else if (html === null) {
-              _iframe.src = url;
-            }
-          }, 333);
-        } else {
-          _iframe.srcdoc = html;
-        }
-      } else {
+      // html not found in cache neither in fetching process, trigger traditional url load
+      if (!html) {
         this.loading(true);
         _iframe.src = url;
+        return this;
+      }
+
+      // html is ready for the iframe injection
+      if (html !== 'fetching') {
+        _iframe.srcdoc = html;
+        return this;
+      }
+
+      // html is still fetching so polling until is ready or timeout
+      if (html === 'fetching') {
+        this.loading(true);
+        const intervalRef = setInterval(() => {
+          html = lscache.get(url);
+
+          if (html && html !== 'fetching') {
+            clearInterval(intervalRef);
+            _iframe.srcdoc = html;
+            this.loading(false);
+          } else if (html === null) {
+            _iframe.src = url;
+          }
+        }, POLLING_TIMEOUT);
+
+        setTimeout(() => {
+          clearInterval(intervalRef);
+          _iframe.src = url;
+        }, POLLING_TIMEOUT);
       }
 
       return this;
