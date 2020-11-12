@@ -4,8 +4,6 @@ export type VTAugmentOptions = {
   mode?: 'drawer' | 'embedded',
 }
 
-const POLLING_TIMEOUT = 5 * 1000;
-
 const CSS_SCOPE = '4rrgf4';
 
 const CSS_STYLESHEET = `
@@ -122,14 +120,10 @@ export class VTAugment {
             _iframe.srcdoc = html;
             this.loading(false);
           } else if (html === null) {
+            clearInterval(intervalRef);
             _iframe.src = url;
           }
-        }, POLLING_TIMEOUT);
-
-        setTimeout(() => {
-          clearInterval(intervalRef);
-          _iframe.src = url;
-        }, POLLING_TIMEOUT);
+        }, 333);
       }
 
       return this;

@@ -23,8 +23,11 @@ export default {
         commonjs(),
         terser({
             output: {
-                comments: false
-            }
+                comments: false,
+            },
+            compress: {
+                drop_console: false,
+            },
         })
     ],
     external: [ "url" ]
