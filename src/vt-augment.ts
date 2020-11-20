@@ -91,7 +91,6 @@ export class VTAugment {
 
     load(url: string) {
       const _iframe: HTMLIFrameIE11Compatible = getIframe(this._container);
-
       // iframe html injection not supported, fallback traditional url load
       if (!('srcdoc' in _iframe)) {
         this.loading(true);

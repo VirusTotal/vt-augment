@@ -33,6 +33,7 @@ var VTAugment = /** @class */ (function () {
         var _iframe = getIframe(this._container);
         // iframe html injection not supported, fallback traditional url load
         if (!('srcdoc' in _iframe)) {
+            console.log('no hay srcdoc');
             this.loading(true);
             _iframe.src = url;
             return this;

@@ -6,7 +6,8 @@
         "noImplicitAny": false,
         "sourceMap": true,
         "allowJs": true,
-        "types": [ "node", "jest" ]
+        "types": [ "node", "jest" ],
+        "esModuleInterop": true,
     },
     "include": [
         "./**/*"
