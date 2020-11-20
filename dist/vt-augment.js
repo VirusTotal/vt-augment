@@ -31,8 +31,8 @@ var VTAugment = /** @class */ (function () {
     VTAugment.prototype.load = function (url) {
         var _this = this;
         var _iframe = getIframe(this._container);
-        // iframe html injection not supported, trigger traditional url load
-        if (_iframe.srcdoc === undefined) {
+        // iframe html injection not supported, fallback traditional url load
+        if (!('srcdoc' in _iframe)) {
             this.loading(true);
             _iframe.src = url;
             return this;
@@ -49,7 +49,7 @@ var VTAugment = /** @class */ (function () {
             _iframe.srcdoc = html;
             return this;
         }
-        // html is still fetching so polling until is ready or timeout
+        // html is still fetching so polling until is ready
         if (html === 'fetching') {
             this.loading(true);
             var intervalRef_1 = setInterval(function () {

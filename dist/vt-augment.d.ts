@@ -1,6 +1,9 @@
 export declare type VTAugmentOptions = {
     mode?: 'drawer' | 'embedded';
 };
+export interface HTMLIFrameIE11Compatible extends Omit<HTMLIFrameElement, 'srcdoc'> {
+    srcdoc?: string;
+}
 export declare class VTAugment {
     _container: HTMLElement;
     _options: VTAugmentOptions;

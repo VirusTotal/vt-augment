@@ -4,6 +4,11 @@ export type VTAugmentOptions = {
   mode?: 'drawer' | 'embedded',
 }
 
+export interface HTMLIFrameIE11Compatible extends Omit<HTMLIFrameElement, 'srcdoc'> {
+  /* srcdoc property is not present in IE11 */
+  srcdoc?: string,
+}
+
 const CSS_SCOPE = '4rrgf4';
 
 const CSS_STYLESHEET = `
@@ -85,10 +90,10 @@ export class VTAugment {
     static factory(container: HTMLElement = null, options: VTAugmentOptions = {}) { return new VTAugment(container, options) }
 
     load(url: string) {
-      const _iframe = getIframe(this._container);
+      const _iframe: HTMLIFrameIE11Compatible = getIframe(this._container);
 
-      // iframe html injection not supported, trigger traditional url load
-      if (_iframe.srcdoc === undefined) {
+      // iframe html injection not supported, fallback traditional url load
+      if (!('srcdoc' in _iframe)) {
         this.loading(true);
         _iframe.src = url;
         return this;
@@ -109,7 +114,7 @@ export class VTAugment {
         return this;
       }
 
-      // html is still fetching so polling until is ready or timeout
+      // html is still fetching so polling until is ready
       if (html === 'fetching') {
         this.loading(true);
         const intervalRef = setInterval(() => {
@@ -130,7 +135,7 @@ export class VTAugment {
     }
 
     preload(url: string) {
-      const _iframe = getIframe(this._container);
+      const _iframe: HTMLIFrameIE11Compatible = getIframe(this._container);
 
       // Avoid caching if browser doesn't support iframe content injection
       if (_iframe.srcdoc === undefined) {
@@ -176,7 +181,7 @@ function createStyleSheet() {
 }
 
 function getIframe(container: HTMLElement) {
-  let _iframe: HTMLIFrameElement = container.querySelector('iframe');
+  let _iframe: HTMLIFrameIE11Compatible = container.querySelector('iframe');
 
   if (!_iframe) {
     _iframe = document.createElement('iframe');
@@ -201,7 +206,7 @@ function getSpinner(container: HTMLElement) {
   return _spinner;
 }
 
-function getHtmlAjax(url) {
+function getHtmlAjax(url: string) {
   const xmlhr = new XMLHttpRequest();
 
   xmlhr.onreadystatechange = function () {
