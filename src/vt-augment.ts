@@ -2,6 +2,7 @@ import lscache from 'lscache';
 
 export type VTAugmentOptions = {
   mode?: 'drawer' | 'embedded',
+  background?: 'string',
 }
 
 export interface HTMLIFrameIE11Compatible extends Omit<HTMLIFrameElement, 'srcdoc'> {
@@ -19,7 +20,7 @@ const CSS_STYLESHEET = `
   }
   .vt-augment-${CSS_SCOPE}.drawer {
     width: 700px;
-    background: #313d5a;
+    background: white;
     border: 1px solid #e6e6e6;
     text-align: left;
     z-index: 102;
@@ -63,16 +64,21 @@ const CSS_STYLESHEET = `
 
 export class VTAugment {
 
-    protected constructor(
+    constructor(
       public _container: HTMLElement,
       public _options: VTAugmentOptions) {
-        createStyleSheet();
-        getIframe(_container);
+        VTAugment.createStyleSheet();
+        VTAugment.getIframe(_container);
 
         _container.classList.add(`vt-augment-${CSS_SCOPE}`);
-        // if (_options.mode === 'drawer') {
+
+        if (_options.background) {
+          _container.style.background = _options.background;
+        }
+
+        if (!_options.mode || _options.mode === 'drawer') {
           _container.classList.add('drawer');
-        // }
+        }
 
         document.body.addEventListener('click', e => {
           if (e.target !== _container) {
@@ -90,7 +96,8 @@ export class VTAugment {
     static factory(container: HTMLElement = null, options: VTAugmentOptions = {}) { return new VTAugment(container, options) }
 
     load(url: string) {
-      const _iframe: HTMLIFrameIE11Compatible = getIframe(this._container);
+      const _iframe: HTMLIFrameIE11Compatible = VTAugment.getIframe(
+          this._container);
       // iframe html injection not supported, fallback traditional url load
       if (!('srcdoc' in _iframe)) {
         this.loading(true);
@@ -127,14 +134,15 @@ export class VTAugment {
             clearInterval(intervalRef);
             _iframe.src = url;
           }
-        }, 333);
+        }, 200);
       }
 
       return this;
     }
 
     preload(url: string) {
-      const _iframe: HTMLIFrameIE11Compatible = getIframe(this._container);
+      const _iframe: HTMLIFrameIE11Compatible = VTAugment.getIframe(
+          this._container);
 
       // Avoid caching if browser doesn't support iframe content injection
       if (_iframe.srcdoc === undefined) {
@@ -145,7 +153,7 @@ export class VTAugment {
 
       if (!html) {
         lscache.set(url, 'fetching', 1);
-        getHtmlAjax(url);
+        VTAugment.getHtmlAjax(url);
       }
     }
 
@@ -165,59 +173,59 @@ export class VTAugment {
     }
 
     loading(active: boolean) {
-      const _spinner = getSpinner(this._container);
-      const _iframe = getIframe(this._container);
+      const _spinner = VTAugment.getSpinner(this._container);
+      const _iframe = VTAugment.getIframe(this._container);
       _spinner.style.display = active ? 'block' : 'none';
       _iframe.style.display = active ? 'none' : 'block';
       return this;
     }
-}
 
-function createStyleSheet() {
-  const _stylesheet = document.createElement('style');
-  _stylesheet.innerHTML = CSS_STYLESHEET;
-  document.body.appendChild(_stylesheet);
-}
-
-function getIframe(container: HTMLElement) {
-  let _iframe: HTMLIFrameIE11Compatible = container.querySelector('iframe');
-
-  if (!_iframe) {
-    _iframe = document.createElement('iframe');
-    _iframe.style.width = '100%';
-    _iframe.style.height = '100%';
-    _iframe.setAttribute('frameborder', '0');
-    container.appendChild(_iframe);
-  }
-
-  return _iframe;
-}
-
-function getSpinner(container: HTMLElement) {
-  let _spinner: HTMLElement = container.querySelector('div.spinner');
-
-  if (!_spinner) {
-    _spinner = document.createElement('div');
-    _spinner.classList.add('spinner');
-    container.appendChild(_spinner);
-  }
-
-  return _spinner;
-}
-
-function getHtmlAjax(url: string) {
-  const xmlhr = new XMLHttpRequest();
-
-  xmlhr.onreadystatechange = function () {
-    if (xmlhr.readyState === XMLHttpRequest.DONE) {
-      if (xmlhr.status === 200) {
-        lscache.set(url, xmlhr.response, 60);
-      } else {
-        lscache.remove(url);
-      }
+    private static createStyleSheet() {
+      const _stylesheet = document.createElement('style');
+      _stylesheet.innerHTML = CSS_STYLESHEET;
+      document.body.appendChild(_stylesheet);
     }
-  };
 
-  xmlhr.open("GET", url, true);
-  xmlhr.send();
+    private static getIframe(container: HTMLElement) {
+      let _iframe: HTMLIFrameIE11Compatible = container.querySelector('iframe');
+
+      if (!_iframe) {
+        _iframe = document.createElement('iframe');
+        _iframe.style.width = '100%';
+        _iframe.style.height = '100%';
+        _iframe.setAttribute('frameborder', '0');
+        container.appendChild(_iframe);
+      }
+
+      return _iframe;
+    }
+
+    private static getSpinner(container: HTMLElement) {
+      let _spinner: HTMLElement = container.querySelector('div.spinner');
+
+      if (!_spinner) {
+        _spinner = document.createElement('div');
+        _spinner.classList.add('spinner');
+        container.appendChild(_spinner);
+      }
+
+      return _spinner;
+    }
+
+    private static getHtmlAjax(url: string) {
+      const xmlhr = new XMLHttpRequest();
+
+      xmlhr.onreadystatechange = function () {
+        if (xmlhr.readyState === XMLHttpRequest.DONE) {
+          if (xmlhr.status === 200) {
+            lscache.set(url, xmlhr.response, 60);
+          } else {
+            lscache.remove(url);
+          }
+        }
+      };
+
+      xmlhr.open("GET", url, true);
+      xmlhr.send();
+    }
 }

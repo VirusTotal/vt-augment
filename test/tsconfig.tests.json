@@ -7,7 +7,6 @@
         "sourceMap": true,
         "allowJs": true,
         "types": [ "node", "jest" ],
-        "esModuleInterop": true,
     },
     "include": [
         "./**/*"

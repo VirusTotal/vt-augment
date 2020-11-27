@@ -1,4 +1,4 @@
-import vtaugment from '../dist/bundle/vt-augment';
+import { VTAugment } from '../src/vt-augment';
 
 const URL_TEST = 'https://google.com/';
 
@@ -9,14 +9,14 @@ beforeEach(() => {
 
 describe('Test VT Augment API methods', function () {
   it('VT Augment can find dom elememt ann create the iframe', async function () {
-    const container = document.querySelector('#container');
-    const vta = vtaugment(container);
+    const container = <HTMLElement>document.querySelector('#container');
+    const vta = new VTAugment(container, {});
     expect(document.querySelector('iframe') instanceof HTMLIFrameElement).toBeTruthy();
   });
 
   it('VT Augment opens and closes the drawer', async function () {
-    const container = document.querySelector('#container');
-    const vta = vtaugment(container);
+    const container = <HTMLElement>document.querySelector('#container');
+    const vta = new VTAugment(container, {});
 
     expect(container.getAttribute('opened')).toBeNull();
     vta.openDrawer();
@@ -26,8 +26,8 @@ describe('Test VT Augment API methods', function () {
   });
 
   it('VT activate spinner when loading', async function () {
-    const container = document.querySelector('#container');
-    const vta = vtaugment(container);
+    const container = <HTMLElement>document.querySelector('#container');
+    const vta = new VTAugment(container, {});
 
     expect(<HTMLElement>container.querySelector('div.spinner')).toBeNull();
     vta.loading(true);
