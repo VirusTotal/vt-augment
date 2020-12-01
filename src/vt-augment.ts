@@ -107,11 +107,10 @@ export class VTAugment {
 
       let html = lscache.get(url);
 
-      // html not found in cache neither in fetching process, trigger traditional url load
+      // html not found in cache neither in fetching process, try to preload it
       if (!html) {
         this.loading(true);
-        _iframe.src = url;
-        return this;
+        this.preload(url);
       }
 
       // html is ready for the iframe injection
@@ -120,7 +119,7 @@ export class VTAugment {
         return this;
       }
 
-      // html is still fetching so polling until is ready
+      // html is still fetching so polling until it is ready
       if (html === 'fetching') {
         this.loading(true);
         const intervalRef = setInterval(() => {
