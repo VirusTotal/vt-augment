@@ -24,6 +24,9 @@ var VTAugment = /** @class */ (function () {
             if (event.data === 'VTAUGMENT:READY') {
                 _this.loading(false);
             }
+            if (event.data === 'VTAUGMENT:CLOSE') {
+                _this.closeDrawer();
+            }
         });
     }
     VTAugment.factory = function (container, options) {
