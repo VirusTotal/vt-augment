@@ -90,6 +90,10 @@ export class VTAugment {
         if (event.data === 'VTAUGMENT:READY') {
           this.loading(false);
         }
+
+        if (event.data === 'VTAUGMENT:CLOSE') {
+          this.closeDrawer();
+        }
       });
       }
 
