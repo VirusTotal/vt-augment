@@ -6,7 +6,7 @@ gulp.task('default', function() {
     return gulp.
         src('./src/**/*.js').
         pipe(closureCompiler({
-            compilation_level: 'ADVANCED',
+            compilation_level: 'SIMPLE',
             warning_level: 'VERBOSE',
             js_output_file: 'dist/vt-augment.min.js',
             process_common_js_modules: true,
@@ -14,7 +14,6 @@ gulp.task('default', function() {
             module_resolution: 'NODE',
             js: 'node_modules/lscache/lscache.js',
             externs: 'externs.js',
-            warnings_allowlist_file: 'zzz',
         })).
         pipe(gulp.dest('./'));
 });
