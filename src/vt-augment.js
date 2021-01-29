@@ -1,5 +1,7 @@
 goog.module('virustotal.VTAugment')
 
+const lscache = require('/node_modules/lscache/lscache');
+
 const CSS_STYLESHEET = `
   .vt-augment {
     display: flex;
@@ -51,8 +53,8 @@ const CSS_STYLESHEET = `
 `;
 
 class VTAugment {
-
     constructor() {
         console.log('hello');
+        console.log(lscache);
       }
 }
