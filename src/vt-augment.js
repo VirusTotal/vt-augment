@@ -24,7 +24,7 @@
  * THE SOFTWARE.
  */
 
-goog.module('virustotal.VTAugment')
+goog.module('virustotal.VTAugment');
 
 const lscache = require('/node_modules/lscache/lscache');
 
@@ -78,31 +78,35 @@ const CSS_STYLESHEET = `
   }
 `;
 
+
+/**
+ *
+ */
 class VTAugment {
-    constructor(container, options) {
-      this.container = container;
-      this.options = options;
+  constructor(container, options) {
+    this.container = container;
+    this.options = options;
 
-      this.createStyleSheet();
-      this.getIframe(this.container);
+    this.createStyleSheet();
+    this.getIframe(this.container);
 
-      this.container.classList.add(`vt-augment`);
+    this.container.classList.add(`vt-augment`);
 
-      if (this.options.background) {
-        this.container.style.background = this.options.background;
+    if (this.options.background) {
+      this.container.style.background = this.options.background;
+    }
+
+    if (!this.options.mode || this.options.mode === 'drawer') {
+      this.container.classList.add('drawer');
+    }
+
+    document.body.addEventListener('click', e => {
+      if (e.target !== this.container) {
+        this.closeDrawer();
       }
+    });
 
-      if (!this.options.mode || this.options.mode === 'drawer') {
-        this.container.classList.add('drawer');
-      }
-
-      document.body.addEventListener('click', e => {
-        if (e.target !== this.container) {
-          this.closeDrawer();
-        }
-      });
-
-      window.addEventListener('message', (event) => {
+    window.addEventListener('message', (event) => {
       if (event.data === 'VTAUGMENT:READY') {
         this.loading(false);
       }
@@ -114,135 +118,135 @@ class VTAugment {
   }
 
   load(url) {
-      const _iframe = this.getIframe(this.container);
-      // iframe html injection not supported, fallback traditional url load
-      if (!('srcdoc' in _iframe)) {
-        this.loading(true);
-        _iframe.src = url;
-        return this;
-      }
-
-      let html = lscache.get(url);
-
-      // html not found in cache neither in fetching process, try to preload it
-      if (!html) {
-        this.loading(true);
-        this.preload(url);
-      }
-
-      // html is ready for the iframe injection
-      if (html !== 'fetching') {
-        _iframe.srcdoc = html;
-        return this;
-      }
-
-      // html is still fetching so polling until it is ready
-      if (html === 'fetching') {
-        this.loading(true);
-        const intervalRef = setInterval(() => {
-          html = lscache.get(url);
-
-          if (html && html !== 'fetching') {
-            clearInterval(intervalRef);
-            _iframe.srcdoc = html;
-            this.loading(false);
-          } else if (html === null) {
-            clearInterval(intervalRef);
-            _iframe.src = url;
-          }
-        }, 200);
-      }
-
+    const _iframe = this.getIframe(this.container);
+    // iframe html injection not supported, fallback traditional url load
+    if (!('srcdoc' in _iframe)) {
+      this.loading(true);
+      _iframe.src = url;
       return this;
     }
 
-    preload(url) {
-      const _iframe = this.getIframe(this.container);
+    let html = lscache.get(url);
 
-      // Avoid caching if browser doesn't support iframe content injection
-      if (_iframe.srcdoc === undefined) {
-        return;
-      }
-
-      const html = lscache.get(url);
-
-      if (!html) {
-        lscache.set(url, 'fetching', 1);
-        this.getHtmlAjax(url);
-      }
+    // html not found in cache neither in fetching process, try to preload it
+    if (!html) {
+      this.loading(true);
+      this.preload(url);
     }
 
-    openDrawer() {
-      this.container.setAttribute('opened', '');
+    // html is ready for the iframe injection
+    if (html !== 'fetching') {
+      _iframe.srcdoc = html;
       return this;
     }
 
-    closeDrawer() {
-      this.container.removeAttribute('opened');
-      return this;
-    }
+    // html is still fetching so polling until it is ready
+    if (html === 'fetching') {
+      this.loading(true);
+      const intervalRef = setInterval(() => {
+        html = lscache.get(url);
 
-    listen() {
-      console.error('listen: Not implemented yet');
-      return this;
-    }
-
-    loading(active) {
-      const _spinner = this.getSpinner(this.container);
-      const _iframe = this.getIframe(this.container);
-      _spinner.style.display = active ? 'block' : 'none';
-      _iframe.style.display = active ? 'none' : 'block';
-      return this;
-    }
-
-    createStyleSheet() {
-      const _stylesheet = document.createElement('style');
-      _stylesheet.innerHTML = CSS_STYLESHEET;
-      document.body.appendChild(_stylesheet);
-    }
-
-    getIframe(container) {
-      let _iframe = container.querySelector('iframe');
-
-      if (!_iframe) {
-        _iframe = document.createElement('iframe');
-        _iframe.style.width = '100%';
-        _iframe.style.height = '100%';
-        _iframe.setAttribute('frameborder', '0');
-        container.appendChild(_iframe);
-      }
-
-      return _iframe;
-    }
-
-    getSpinner(container) {
-      let _spinner = container.querySelector('div.spinner');
-
-      if (!_spinner) {
-        _spinner = document.createElement('div');
-        _spinner.classList.add('spinner');
-        container.appendChild(_spinner);
-      }
-
-      return _spinner;
-    }
-
-    getHtmlAjax(url) {
-      const xmlhr = new XMLHttpRequest();
-
-      xmlhr.onreadystatechange = function () {
-        if (xmlhr.readyState === XMLHttpRequest.DONE) {
-          if (xmlhr.status === 200) {
-            lscache.set(url, xmlhr.response, 60);
-          } else {
-            lscache.remove(url);
-          }
+        if (html && html !== 'fetching') {
+          clearInterval(intervalRef);
+          _iframe.srcdoc = html;
+          this.loading(false);
+        } else if (html === null) {
+          clearInterval(intervalRef);
+          _iframe.src = url;
         }
-      };
-
-      xmlhr.open("GET", url, true);
-      xmlhr.send();
+      }, 200);
     }
+
+    return this;
+  }
+
+  preload(url) {
+    const _iframe = this.getIframe(this.container);
+
+    // Avoid caching if browser doesn't support iframe content injection
+    if (_iframe.srcdoc === undefined) {
+      return;
+    }
+
+    const html = lscache.get(url);
+
+    if (!html) {
+      lscache.set(url, 'fetching', 1);
+      this.getHtmlAjax(url);
+    }
+  }
+
+  openDrawer() {
+    this.container.setAttribute('opened', '');
+    return this;
+  }
+
+  closeDrawer() {
+    this.container.removeAttribute('opened');
+    return this;
+  }
+
+  listen() {
+    console.error('listen: Not implemented yet');
+    return this;
+  }
+
+  loading(active) {
+    const _spinner = this.getSpinner(this.container);
+    const _iframe = this.getIframe(this.container);
+    _spinner.style.display = active ? 'block' : 'none';
+    _iframe.style.display = active ? 'none' : 'block';
+    return this;
+  }
+
+  createStyleSheet() {
+    const _stylesheet = document.createElement('style');
+    _stylesheet.innerHTML = CSS_STYLESHEET;
+    document.body.appendChild(_stylesheet);
+  }
+
+  getIframe(container) {
+    let _iframe = container.querySelector('iframe');
+
+    if (!_iframe) {
+      _iframe = document.createElement('iframe');
+      _iframe.style.width = '100%';
+      _iframe.style.height = '100%';
+      _iframe.setAttribute('frameborder', '0');
+      container.appendChild(_iframe);
+    }
+
+    return _iframe;
+  }
+
+  getSpinner(container) {
+    let _spinner = container.querySelector('div.spinner');
+
+    if (!_spinner) {
+      _spinner = document.createElement('div');
+      _spinner.classList.add('spinner');
+      container.appendChild(_spinner);
+    }
+
+    return _spinner;
+  }
+
+  getHtmlAjax(url) {
+    const xmlhr = new XMLHttpRequest();
+
+    xmlhr.onreadystatechange = function () {
+      if (xmlhr.readyState === XMLHttpRequest.DONE) {
+        if (xmlhr.status === 200) {
+          lscache.set(url, xmlhr.response, 60);
+        } else {
+          lscache.remove(url);
+        }
+      }
+    };
+
+    xmlhr.open("GET", url, true);
+    xmlhr.send();
+  }
 }
 
-exports = VTAugment
+window['vtaugment'] = VTAugment;
