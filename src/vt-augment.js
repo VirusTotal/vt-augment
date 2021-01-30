@@ -24,7 +24,7 @@
  * THE SOFTWARE.
  */
 
-goog.module('virustotal.VTAugment');
+goog.provide('vtaugment');
 
 const lscache = require('/node_modules/lscache/lscache');
 
@@ -248,5 +248,3 @@ class VTAugment {
     xmlhr.send();
   }
 }
-
-window['vtaugment'] = VTAugment;

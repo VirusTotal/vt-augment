@@ -14,6 +14,7 @@ gulp.task('default', function() {
             module_resolution: 'NODE',
             js: 'node_modules/lscache/lscache.js',
             externs: 'externs.js',
+            output_wrapper_file: 'umd-wrapper.js'
         })).
         pipe(gulp.dest('./'));
 });
