@@ -12,9 +12,10 @@ gulp.task('default', function() {
             process_common_js_modules: true,
             entry_point: 'vt-augment',
             module_resolution: 'NODE',
-            js: 'node_modules/lscache/lscache.js',
             externs: 'externs.js',
-            output_wrapper_file: 'umd-wrapper.js'
+            output_wrapper_file: 'umd-wrapper.js',
+            dependency_mode: 'PRUNE',
+            js: 'node_modules/lscache/lscache.js',
         })).
         pipe(gulp.dest('./'));
 });

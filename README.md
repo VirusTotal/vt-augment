@@ -45,21 +45,13 @@ VT Augment is compatible with all modern browsers and IE11.
 
 # Usage
 
-**VT Augment is bundled using the UMD format (@`dist/bundle/vt-augment.js`), ESM format (@`dist/bundle/vt-augment.esm.js`) alongside es2015 modules (@`dist/index.js`) and typescript definitions.**
+**VT Augment is bundled using the UMD format (@`dist/vt-augment.min.js`).**
 
 ## Import
 
 ```html
 <!--- "vtaugment" will be attached to the global window object. -->
-<script src="dist/bundle/vt-augment.js"></script>
-```
-
-```javascript
-// es2015 modules
-import vtaugment from "vtaugment"
-
-// commonjs
-var vtaugment = require("vtaugment")
+<script src="dist/vt-augment.min.js"></script>
 ```
 
 ## Code
@@ -68,10 +60,11 @@ var vtaugment = require("vtaugment")
 ```
 
 ```javascript
-const container = document.querySelector('#vt-augment-container');
+var container = document.querySelector('#vt-augment-container');
 
-vtaugment(container, options)
-  .url("...")
+var vta = new vtaugment(container, options)
+
+vta.url("...").openDrawer()
 ```
 
 ## Modes
@@ -156,9 +149,5 @@ vtaugment(container).loading(true)
 ```
 
 ## Options
-
-TODO
-
-# License
 
 TODO

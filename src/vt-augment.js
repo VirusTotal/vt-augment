@@ -1,9 +1,11 @@
 /**
- * @license
+ * @fileoverview VTAugment is a library to interact with the VirusTotal Augment
+ * product.
  *
+ * @license
  * The MIT License
  *
- * Copyright (c) 2020-2021 Google, Inc. http://virustotal.com
+ * Copyright (c) 2021 Google, Inc. http://virustotal.com
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,8 +25,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
-goog.provide('vtaugment');
+goog.provide('VTAugment');
 
 const lscache = require('/node_modules/lscache/lscache');
 
@@ -78,11 +79,7 @@ const CSS_STYLESHEET = `
   }
 `;
 
-
-/**
- *
- */
-class VTAugment {
+var VTAugment = class {
   constructor(container, options) {
     this.container = container;
     this.options = options;
@@ -136,6 +133,7 @@ class VTAugment {
 
     // html is ready for the iframe injection
     if (html !== 'fetching') {
+      //goog.dom.safe.setIframeSrcdoc(_iframe, html);
       _iframe.srcdoc = html;
       return this;
     }
