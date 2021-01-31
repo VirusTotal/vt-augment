@@ -23,6 +23,7 @@
     "devDependencies": {
         "@google-cloud/storage": "^5.0.1",
         "google-closure-compiler": "^20210106.0.0",
+        "google-closure-deps": "^20210106.0.0",
         "google-closure-library": "^20210106.0.0",
         "gulp": "^4.0.2"
     },

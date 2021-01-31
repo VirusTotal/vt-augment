@@ -14,8 +14,11 @@ gulp.task('default', function() {
             module_resolution: 'NODE',
             externs: 'externs.js',
             output_wrapper_file: 'umd-wrapper.js',
-            dependency_mode: 'PRUNE',
-            js: 'node_modules/lscache/lscache.js',
+            dependency_mode: 'PRUNE_LEGACY',
+            js: [
+              'node_modules/google-closure-library/**/*.js',
+              'node_modules/lscache/lscache.js',
+            ],
         })).
         pipe(gulp.dest('./'));
 });
