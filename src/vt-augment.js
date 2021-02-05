@@ -35,6 +35,8 @@ const SafeStyleSheet = goog.require('goog.html.SafeStyleSheet');
 const TrustedResourceUrl = goog.require('goog.html.TrustedResourceUrl');
 const lscache = require('/node_modules/lscache/lscache');
 const {installSafeStyleSheet} = goog.require('goog.style');
+const {setInnerHtml} = goog.require('goog.dom.safe');
+const SafeHtml = goog.require('goog.html.SafeHtml');
 
 /**
  * @typedef {{
@@ -69,6 +71,10 @@ const CSS_STYLESHEET = `
     animation: slideFromRight 0.2s 1 forwards;
   }
   .vt-augment > .spinner {
+    position: absolute;
+    z-index: 199;
+    top: calc(50% - 50px);
+    left: calc(50% - 50px);
     border: 8px solid rgba(0, 0, 0, 0.2);
     border-left-color: white;
     border-radius: 50%;
@@ -103,9 +109,10 @@ class VTAugment {
   constructor(container, options) {
     this.container = container;
     this.options = options;
+    this.isSrcdocSupported = !!("srcdoc" in document.createElement("iframe"))
+        && SafeHtml.canUseSandboxIframe();
 
     this.createStyleSheet_();
-    this.getIframe_(this.container);
 
     this.container.classList.add(`vt-augment`);
 
@@ -136,20 +143,13 @@ class VTAugment {
   load(url) {
     if (!url) return this;
 
-    const token = url.split('/').pop();
-    const safeVTUrl =
-      Const.from('https://www.virustotal.com/ui/widget/html/%{token}');
-    const safeUrl = TrustedResourceUrl.format(safeVTUrl, {
-      'token': token,
-    });
+    const safeUrl = this.safeUrl_(url);
 
-    const _iframe = this.getIframe_(this.container);
     // iframe html injection not supported, fallback traditional url load
-    if (!('srcdoc' in _iframe)) {
+    if (!this.isSrcdocSupported) {
       this.loading_(true);
-      if (_iframe) {
-        _iframe.src = safeUrl;
-      }
+      this.createIframe_(this.container, safeUrl, null);
+
       return this;
     }
 
@@ -163,9 +163,7 @@ class VTAugment {
 
     // html is ready for the iframe injection
     if (html !== 'fetching') {
-      if (_iframe) {
-        _iframe.srcdoc = html;
-      }
+      this.createIframe_(this.container, null, html);
       return this;
     }
 
@@ -177,16 +175,11 @@ class VTAugment {
 
         if (html && html !== 'fetching') {
           clearInterval(intervalRef);
-
-          if (_iframe) {
-            _iframe.srcdoc = html;
-          }
+          this.createIframe_(this.container, null, html);
           this.loading_(false);
         } else if (html === null) {
           clearInterval(intervalRef);
-          if (_iframe) {
-            _iframe.src = safeUrl;
-          }
+          this.createIframe_(this.container, safeUrl, null);
         }
       }, 200);
     }
@@ -199,16 +192,12 @@ class VTAugment {
    * @param {string} url
    */
   preload(url) {
-    const _iframe = this.getIframe_(this.container);
-
     // Avoid caching if browser doesn't support iframe content injection
-    if (_iframe.srcdoc === undefined) {
+    if (!this.isSrcdocSupported) {
       return;
     }
 
-    const html = lscache.get(url);
-
-    if (!html) {
+    if (!lscache.get(url)) {
       lscache.set(url, 'fetching', 1);
       this.getHtmlAjax_(url);
     }
@@ -247,10 +236,15 @@ class VTAugment {
    * @return {!VTAugment}
    */
   loading_(active) {
-    const _spinner = this.getSpinner_(this.container);
-    const _iframe = this.getIframe_(this.container);
-    _spinner.style.display = active ? 'block' : 'none';
-    _iframe.style.display = active ? 'none' : 'block';
+    const spinner = this.getSpinner_(this.container);
+    const iframe = this.container.querySelector('iframe');
+
+    spinner.style.display = active ? 'block' : 'none';
+
+    if (iframe) {
+      iframe.style.display = active ? 'none' : 'block';
+    }
+
     return this;
   }
 
@@ -267,20 +261,42 @@ class VTAugment {
   /**
    * @private
    * @param {!Element} container
-   * @return {!HTMLIFrameElement}
+   * @param {?TrustedResourceUrl} safeUrl
+   * @param {?string} html
+   * @return {void}
    */
-  getIframe_(container) {
-    let _iframe = /** @type {?HTMLIFrameElement} */ (container.querySelector('iframe'));
+  createIframe_(container, safeUrl, html) {
+    const iframeAttrs = {
+      style: {width: '100%', height: '100%', border: '0'},
+      frameborder: 0,
+    };
 
-    if (!_iframe) {
-      _iframe = /** @type {!HTMLIFrameElement} */ (document.createElement('iframe'));
-      _iframe.style.width = '100%';
-      _iframe.style.height = '100%';
-      _iframe.setAttribute('frameborder', '0');
-      container.appendChild(_iframe);
+    let iframe = /** @type {?HTMLIFrameElement} */ (
+        container.querySelector('iframe'));
+    if (iframe) {
+      iframe.parentNode.removeChild(iframe);
     }
 
-    return _iframe;
+    const temp = document.createElement('div');
+    temp.style.display = 'none';
+
+    if (safeUrl) {
+      const iframe = SafeHtml.createIframe(safeUrl, undefined, iframeAttrs);
+
+      setInnerHtml(temp, iframe);
+      temp.firstChild.removeAttribute('sandbox');
+
+      container.appendChild(temp.removeChild(temp.firstChild));
+    } else {
+      const sandboxedIframe = SafeHtml.createSandboxIframe(
+          undefined, html, iframeAttrs);
+
+      setInnerHtml(temp, sandboxedIframe);
+      temp.firstChild.setAttribute(
+          'sandbox', 'allow-scripts allow-same-origin');
+
+      container.appendChild(temp.removeChild(temp.firstChild));
+    }
   }
 
   /**
@@ -303,7 +319,7 @@ class VTAugment {
 
   /**
    * @private
-   * @param {string} url
+   * @param {!string} url
    */
   getHtmlAjax_(url) {
     const xmlhr = new XMLHttpRequest();
@@ -339,6 +355,22 @@ class VTAugment {
         default:
       }
   }
+
+  /**
+   * @private
+   * @param {!string} url
+   * @return {!TrustedResourceUrl}
+   */
+  safeUrl_(url) {
+    const token = url.split('/').pop();
+    const safeVTUrl =
+      Const.from('https://www.virustotal.com/ui/widget/html/%{token}');
+    const safeUrl = TrustedResourceUrl.format(safeVTUrl, {
+      'token': token,
+    });
+
+    return safeUrl;
+  }
 }
 
-exports = VTAugment
+exports = {VTAugment};
