@@ -106,7 +106,7 @@ class VTAugment {
    * @param {!Element} container
    * @param {?Options} options
    */
-  constructor(container, options) {
+  constructor(container, options = {}) {
     this.container = container;
     this.options = options;
     this.isSrcdocSupported = !!("srcdoc" in document.createElement("iframe"))

@@ -60,9 +60,9 @@ VT Augment is compatible with all modern browsers and IE11.
 ```
 
 ```javascript
-var container = document.querySelector('#vt-augment-container');
+const container = document.querySelector('#vt-augment-container');
 
-var vta = new vtaugment(container, options)
+const vta = new vtaugment(container, options)
 
 vta.url("...").openDrawer()
 ```
