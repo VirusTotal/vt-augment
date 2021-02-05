@@ -31,12 +31,12 @@
 goog.module('vtaugment');
 
 const Const = goog.require('goog.string.Const');
+const SafeHtml = goog.require('goog.html.SafeHtml');
 const SafeStyleSheet = goog.require('goog.html.SafeStyleSheet');
 const TrustedResourceUrl = goog.require('goog.html.TrustedResourceUrl');
 const lscache = require('/node_modules/lscache/lscache');
 const {installSafeStyleSheet} = goog.require('goog.style');
 const {setInnerHtml} = goog.require('goog.dom.safe');
-const SafeHtml = goog.require('goog.html.SafeHtml');
 
 /**
  * @typedef {{
@@ -148,7 +148,7 @@ class VTAugment {
     // iframe html injection not supported, fallback traditional url load
     if (!this.isSrcdocSupported) {
       this.loading_(true);
-      this.createIframe_(this.container, safeUrl, null);
+      this.createIframe_(this.container, safeUrl, undefined);
 
       return this;
     }
@@ -163,7 +163,7 @@ class VTAugment {
 
     // html is ready for the iframe injection
     if (html !== 'fetching') {
-      this.createIframe_(this.container, null, html);
+      this.createIframe_(this.container, undefined, html);
       return this;
     }
 
@@ -175,11 +175,11 @@ class VTAugment {
 
         if (html && html !== 'fetching') {
           clearInterval(intervalRef);
-          this.createIframe_(this.container, null, html);
+          this.createIframe_(this.container, undefined, html);
           this.loading_(false);
         } else if (html === null) {
           clearInterval(intervalRef);
-          this.createIframe_(this.container, safeUrl, null);
+          this.createIframe_(this.container, safeUrl, undefined);
         }
       }, 200);
     }
@@ -261,8 +261,8 @@ class VTAugment {
   /**
    * @private
    * @param {!Element} container
-   * @param {?TrustedResourceUrl} safeUrl
-   * @param {?string} html
+   * @param {!TrustedResourceUrl|undefined} safeUrl
+   * @param {string|undefined} html
    * @return {void}
    */
   createIframe_(container, safeUrl, html) {
@@ -319,7 +319,7 @@ class VTAugment {
 
   /**
    * @private
-   * @param {!string} url
+   * @param {string} url
    */
   getHtmlAjax_(url) {
     const xmlhr = new XMLHttpRequest();
@@ -358,7 +358,7 @@ class VTAugment {
 
   /**
    * @private
-   * @param {!string} url
+   * @param {string} url
    * @return {!TrustedResourceUrl}
    */
   safeUrl_(url) {
