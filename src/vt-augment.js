@@ -109,12 +109,12 @@ class VTAugment {
   constructor(container, options) {
     this.container = container;
     this.options = options || {};
-    this.isSrcdocSupported = !!("srcdoc" in document.createElement("iframe"))
+    this.isSrcdocSupported = !!('srcdoc' in document.createElement('iframe'))
         && SafeHtml.canUseSandboxIframe();
 
     this.createStyleSheet_();
 
-    this.container.classList.add(`vt-augment`);
+    this.container.classList.add('vt-augment');
 
     if (this.options.background) {
       this.container.style.background = this.options.background;
@@ -222,15 +222,6 @@ class VTAugment {
   }
 
   /**
-   * @public
-   * @return {!VTAugment}
-   */
-  listen() {
-    console.error('listen: Not implemented yet');
-    return this;
-  }
-
-  /**
    * @private
    * @param {boolean} active
    * @return {!VTAugment}
@@ -293,7 +284,7 @@ class VTAugment {
 
       setInnerHtml(temp, sandboxedIframe);
       temp.firstChild.setAttribute(
-          'sandbox', 'allow-scripts allow-same-origin');
+          'sandbox', 'allow-scripts allow-same-origin allow-popups');
 
       container.appendChild(temp.removeChild(temp.firstChild));
     }
@@ -324,17 +315,18 @@ class VTAugment {
   getHtmlAjax_(url) {
     const xmlhr = new XMLHttpRequest();
 
-    xmlhr.onreadystatechange = function () {
+    xmlhr.onreadystatechange = () => {
       if (xmlhr.readyState === XMLHttpRequest.DONE) {
         if (xmlhr.status === 200) {
           lscache.set(url, xmlhr.response, 60);
+          this.loading_(false);
         } else {
           lscache.remove(url);
         }
       }
     };
 
-    xmlhr.open("GET", url, true);
+    xmlhr.open('GET', url, true);
     xmlhr.send();
   }
 
