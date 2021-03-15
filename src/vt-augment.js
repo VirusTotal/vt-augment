@@ -344,6 +344,9 @@ class VTAugment {
         case 'VTAUGMENT:CLOSE':
           this.closeDrawer();
           break;
+        case 'VTAUGMENT:CLEAR_CACHE':
+          lscache.flush();
+          break;
         default:
       }
   }
