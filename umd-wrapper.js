@@ -9,5 +9,5 @@
   }
 }(this, function () {
   %output%
-  return module$exports$vtaugment.VTAugment;
+  return Z.VTAugment;
 }.bind(this)));

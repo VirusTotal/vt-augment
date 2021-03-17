@@ -71,11 +71,7 @@ vta.url("...").openDrawer()
 
 #### Drawer
 
-TODO
-
-#### Embedded
-
-TODO
+This is the default mode, VT Augment will be shown in a right side panel.
 
 # API
 
@@ -130,15 +126,6 @@ vtaugment(container).closeDrawer()
 
 ```
 
-#### listen(event: string, callback: any)
-
-Not implemented yet.
-
-```js
-vtaugment(container).listen("...", callback)
-
-```
-
 #### loading(active: boolean)
 
 The loading state is managed internally by the library but in the case of need the api provides this method to control loading manually. (Active loading hide the content)
@@ -150,4 +137,8 @@ vtaugment(container).loading(true)
 
 ## Options
 
-TODO
+```js
+{
+    background: '#fff', // Background color for loading states
+}
+```

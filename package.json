@@ -1,6 +1,6 @@
 {
     "name": "@virustotal/vt-augment",
-    "version": "1.4.0",
+    "version": "1.4.1",
     "description": "Client library that wraps common patterns when interact with the Virustotal Augment product",
     "keywords": [
         "virustotal",
@@ -16,7 +16,8 @@
         "url": "https://github.com/VirusTotal/vt-augment/issues"
     },
     "scripts": {
-        "build": "gulp"
+        "build": "gulp && npm run size",
+        "size": "ls -hl dist/ | awk 'FNR == 2 {print $5}'"
     },
     "author": "",
     "license": "",
