@@ -195,7 +195,7 @@ class VTAugment {
 
     // iframe html injection not supported, fallback traditional url load
     if (!this.isSrcdocSupported) {
-      this.loading_(true);
+      this.loading(true);
       this.createIframe_(this.container, safeUrl, undefined);
 
       return this;
@@ -205,7 +205,7 @@ class VTAugment {
 
     // html not found in cache neither in fetching process, try to preload it
     if (!html) {
-      this.loading_(true);
+      this.loading(true);
       this.preload(url);
     }
 
@@ -217,14 +217,14 @@ class VTAugment {
 
     // html is still fetching so polling until it is ready
     if (html === 'fetching') {
-      this.loading_(true);
+      this.loading(true);
       const intervalRef = setInterval(() => {
         html = this.cache.get(url);
 
         if (html && html !== 'fetching') {
           clearInterval(intervalRef);
           this.createIframe_(this.container, undefined, html);
-          this.loading_(false);
+          this.loading(false);
         } else if (html === null) {
           clearInterval(intervalRef);
           this.createIframe_(this.container, safeUrl, undefined);
@@ -270,11 +270,11 @@ class VTAugment {
   }
 
   /**
-   * @private
+   * @export
    * @param {boolean} active
    * @return {!VTAugment}
    */
-  loading_(active) {
+  loading(active) {
     const spinner = this.getSpinner_(this.container);
     const iframe = this.container.querySelector('iframe');
 
@@ -386,7 +386,7 @@ class VTAugment {
 
       switch (message) {
         case 'VTAUGMENT:READY':
-          this.loading_(false);
+          this.loading(false);
           break;
         case 'VTAUGMENT:CLOSE':
           this.closeDrawer();
