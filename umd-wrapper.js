@@ -9,5 +9,4 @@
   }
 }(this, function () {
   %output%
-  return Z.VTAugment;
 }.bind(this)));

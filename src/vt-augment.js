@@ -34,7 +34,6 @@ const Const = goog.require('goog.string.Const');
 const SafeHtml = goog.require('goog.html.SafeHtml');
 const SafeStyleSheet = goog.require('goog.html.SafeStyleSheet');
 const TrustedResourceUrl = goog.require('goog.html.TrustedResourceUrl');
-const lscache = require('/node_modules/lscache/lscache');
 const {installSafeStyleSheet} = goog.require('goog.style');
 const {setInnerHtml} = goog.require('goog.dom.safe');
 
@@ -101,12 +100,61 @@ const CSS_STYLESHEET = `
   }
 `;
 
+
+/**
+ * Internal cache to store iframe html content.
+ * @private
+ */
+class Cache {
+  constructor() {
+    this.store = new Map();
+  }
+
+  /**
+   * @public
+   * @param {string} key
+   * @return {string}
+   */
+  get(key) {
+    return this.store.get(key);
+  }
+
+  /**
+   * @public
+   * @param {string} key
+   * @param {Object|null|string} value
+   * @return {void}
+   */
+  set(key, value) {
+    this.store.set(key, value);
+  }
+
+  /**
+   * @public
+   * @param {string} key
+   * @return {boolean}
+   */
+  remove(key) {
+    return this.store.delete(key);
+  }
+
+  /**
+   * @public
+   * @return {void}
+   */
+  flush() {
+    this.store = new Map();
+  }
+}
+
+
 class VTAugment {
   /**
    * @param {!Element} container
    * @param {?Options} options
    */
   constructor(container, options) {
+    this.cache = new Cache();
     this.container = container;
     this.options = options || {};
     this.isSrcdocSupported = !!('srcdoc' in document.createElement('iframe'))
@@ -136,7 +184,7 @@ class VTAugment {
   }
 
   /**
-   * @public
+   * @export
    * @param {string} url
    * @return {!VTAugment}
    */
@@ -153,7 +201,7 @@ class VTAugment {
       return this;
     }
 
-    let html = lscache.get(url);
+    let html = this.cache.get(url);
 
     // html not found in cache neither in fetching process, try to preload it
     if (!html) {
@@ -171,7 +219,7 @@ class VTAugment {
     if (html === 'fetching') {
       this.loading_(true);
       const intervalRef = setInterval(() => {
-        html = lscache.get(url);
+        html = this.cache.get(url);
 
         if (html && html !== 'fetching') {
           clearInterval(intervalRef);
@@ -188,7 +236,7 @@ class VTAugment {
   }
 
   /**
-   * @public
+   * @export
    * @param {string} url
    */
   preload(url) {
@@ -197,14 +245,14 @@ class VTAugment {
       return;
     }
 
-    if (!lscache.get(url)) {
-      lscache.set(url, 'fetching', 1);
+    if (!this.cache.get(url)) {
+      this.cache.set(url, 'fetching');
       this.getHtmlAjax_(url);
     }
   }
 
   /**
-   * @public
+   * @export
    * @return {!VTAugment}
    */
   openDrawer() {
@@ -213,7 +261,7 @@ class VTAugment {
   }
 
   /**
-   * @public
+   * @export
    * @return {!VTAugment}
    */
   closeDrawer() {
@@ -318,10 +366,9 @@ class VTAugment {
     xmlhr.onreadystatechange = () => {
       if (xmlhr.readyState === XMLHttpRequest.DONE) {
         if (xmlhr.status === 200) {
-          lscache.set(url, xmlhr.response, 60);
-          this.loading_(false);
+          this.cache.set(url, xmlhr.response);
         } else {
-          lscache.remove(url);
+          this.cache.remove(url);
         }
       }
     };
@@ -345,7 +392,7 @@ class VTAugment {
           this.closeDrawer();
           break;
         case 'VTAUGMENT:CLEAR_CACHE':
-          lscache.flush();
+          this.cache.flush();
           break;
         default:
       }
@@ -369,3 +416,4 @@ class VTAugment {
 }
 
 exports = {VTAugment};
+window['VTAugment'] = VTAugment;
