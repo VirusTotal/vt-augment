@@ -113,7 +113,7 @@ class Cache {
   /**
    * @public
    * @param {string} key
-   * @return {string}
+   * @return {!string|undefined}
    */
   get(key) {
     return this.store.get(key);
@@ -122,7 +122,7 @@ class Cache {
   /**
    * @public
    * @param {string} key
-   * @param {Object|null|string} value
+   * @param {!Object|null|string} value
    * @return {void}
    */
   set(key, value) {
@@ -206,12 +206,17 @@ class VTAugment {
     // html not found in cache neither in fetching process, try to preload it
     if (!html) {
       this.loading(true);
-      this.preload(url);
+      this.createIframe_(this.container, safeUrl, undefined);
+      this.getHtmlAjax_(url);
+
+      return this;
     }
 
     // html is ready for the iframe injection
     if (html !== 'fetching') {
+      this.loading(false);
       this.createIframe_(this.container, undefined, html);
+
       return this;
     }
 
@@ -368,8 +373,11 @@ class VTAugment {
         if (xmlhr.status === 200) {
           this.cache.set(url, xmlhr.response);
         } else {
+          this.loading(false);
           this.cache.remove(url);
         }
+      } else {
+        this.loading(false);
       }
     };
 
@@ -404,11 +412,11 @@ class VTAugment {
    * @return {!TrustedResourceUrl}
    */
   safeUrl_(url) {
-    const token = url.split('/').pop();
+    const tail = url.split('https://www.virustotal.com').pop();
     const safeVTUrl =
-      Const.from('https://www.virustotal.com/ui/widget/html/%{token}');
+      Const.from('https://www.virustotal.com/%{tail}');
     const safeUrl = TrustedResourceUrl.format(safeVTUrl, {
-      'token': token,
+      'tail': tail,
     });
 
     return safeUrl;
