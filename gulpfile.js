@@ -2,6 +2,7 @@ var gulp = require('gulp');
 
 var closureCompiler = require('google-closure-compiler').gulp();
 
+
 gulp.task('default', function() {
     return gulp.
         src('./src/**/*.js').
@@ -15,6 +16,7 @@ gulp.task('default', function() {
             module_resolution: 'NODE',
             output_wrapper_file: 'umd-wrapper.js',
             assume_function_wrapper: true,
+            hide_warnings_for: 'node_modules/',
             js: [
               'node_modules/google-closure-library/closure/**/*.js',
             ],
