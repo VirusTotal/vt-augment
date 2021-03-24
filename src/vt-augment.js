@@ -412,11 +412,11 @@ class VTAugment {
    * @return {!TrustedResourceUrl}
    */
   safeUrl_(url) {
-    const tail = url.split('https://www.virustotal.com').pop();
+    const token = url.split('/').pop();
     const safeVTUrl =
-      Const.from('https://www.virustotal.com/%{tail}');
+      Const.from('https://www.virustotal.com/ui/widget/html/%{token}');
     const safeUrl = TrustedResourceUrl.format(safeVTUrl, {
-      'tail': tail,
+      'token': token,
     });
 
     return safeUrl;
