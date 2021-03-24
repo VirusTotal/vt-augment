@@ -62,9 +62,9 @@ VT Augment is compatible with all modern browsers and IE11.
 ```javascript
 const container = document.querySelector('#vt-augment-container');
 
-const vta = new vtaugment(container, options)
+const vtaugment = new VTAugment(container, options)
 
-vta.url("...").openDrawer()
+vtaugment.load("[url]").openDrawer()
 ```
 
 ## Modes
@@ -91,11 +91,11 @@ Creates a new object with a html element and a set of options. An iframe is dyna
 Loads the VT API url into the iframe.
 
 ```js
-vtaugment(container).load("...")
+vtaugment.load("...")
 
 // Additionally, if the mode is `drawer` can be used along with the method `openDrawer`
 
-vtaugment(container).load("...").openDrawer()
+vtaugment.load("...").openDrawer()
 
 ```
 
@@ -104,7 +104,7 @@ vtaugment(container).load("...").openDrawer()
 Load the html and cache it ready to show the content as soon as you call the `load` method. Typically this method is used linked to a `mouseover` event in the link or the surrounded area of the link.
 
 ```js
-vtaugment(container).preload("...")
+vtaugment.preload("...")
 
 ```
 
@@ -113,7 +113,7 @@ vtaugment(container).preload("...")
 Open a drawer panel from the right side. (Only works in [drawer](#drawer) mode)
 
 ```js
-vtaugment(container).openDrawer()
+vtaugment.openDrawer()
 
 ```
 
@@ -122,7 +122,7 @@ vtaugment(container).openDrawer()
 Close the drawer panel. (Only works in [drawer](#drawer) mode)
 
 ```js
-vtaugment(container).closeDrawer()
+vtaugment.closeDrawer()
 
 ```
 
@@ -131,7 +131,7 @@ vtaugment(container).closeDrawer()
 The loading state is managed internally by the library but in the case of need the api provides this method to control loading manually. (Active loading hide the content)
 
 ```js
-vtaugment(container).loading(true)
+vtaugment.loading(true)
 
 ```
 

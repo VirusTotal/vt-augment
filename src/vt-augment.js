@@ -34,7 +34,6 @@ const Const = goog.require('goog.string.Const');
 const SafeHtml = goog.require('goog.html.SafeHtml');
 const SafeStyleSheet = goog.require('goog.html.SafeStyleSheet');
 const TrustedResourceUrl = goog.require('goog.html.TrustedResourceUrl');
-const lscache = require('/node_modules/lscache/lscache');
 const {installSafeStyleSheet} = goog.require('goog.style');
 const {setInnerHtml} = goog.require('goog.dom.safe');
 
@@ -101,12 +100,61 @@ const CSS_STYLESHEET = `
   }
 `;
 
+
+/**
+ * Internal cache to store iframe html content.
+ * @private
+ */
+class Cache {
+  constructor() {
+    this.store = new Map();
+  }
+
+  /**
+   * @public
+   * @param {string} key
+   * @return {!string|undefined}
+   */
+  get(key) {
+    return this.store.get(key);
+  }
+
+  /**
+   * @public
+   * @param {string} key
+   * @param {!Object|null|string} value
+   * @return {void}
+   */
+  set(key, value) {
+    this.store.set(key, value);
+  }
+
+  /**
+   * @public
+   * @param {string} key
+   * @return {boolean}
+   */
+  remove(key) {
+    return this.store.delete(key);
+  }
+
+  /**
+   * @public
+   * @return {void}
+   */
+  flush() {
+    this.store = new Map();
+  }
+}
+
+
 class VTAugment {
   /**
    * @param {!Element} container
    * @param {?Options} options
    */
   constructor(container, options) {
+    this.cache = new Cache();
     this.container = container;
     this.options = options || {};
     this.isSrcdocSupported = !!('srcdoc' in document.createElement('iframe'))
@@ -136,7 +184,7 @@ class VTAugment {
   }
 
   /**
-   * @public
+   * @export
    * @param {string} url
    * @return {!VTAugment}
    */
@@ -147,36 +195,41 @@ class VTAugment {
 
     // iframe html injection not supported, fallback traditional url load
     if (!this.isSrcdocSupported) {
-      this.loading_(true);
+      this.loading(true);
       this.createIframe_(this.container, safeUrl, undefined);
 
       return this;
     }
 
-    let html = lscache.get(url);
+    let html = this.cache.get(url);
 
     // html not found in cache neither in fetching process, try to preload it
     if (!html) {
-      this.loading_(true);
-      this.preload(url);
+      this.loading(true);
+      this.createIframe_(this.container, safeUrl, undefined);
+      this.getHtmlAjax_(url);
+
+      return this;
     }
 
     // html is ready for the iframe injection
     if (html !== 'fetching') {
+      this.loading(false);
       this.createIframe_(this.container, undefined, html);
+
       return this;
     }
 
     // html is still fetching so polling until it is ready
     if (html === 'fetching') {
-      this.loading_(true);
+      this.loading(true);
       const intervalRef = setInterval(() => {
-        html = lscache.get(url);
+        html = this.cache.get(url);
 
         if (html && html !== 'fetching') {
           clearInterval(intervalRef);
           this.createIframe_(this.container, undefined, html);
-          this.loading_(false);
+          this.loading(false);
         } else if (html === null) {
           clearInterval(intervalRef);
           this.createIframe_(this.container, safeUrl, undefined);
@@ -188,7 +241,7 @@ class VTAugment {
   }
 
   /**
-   * @public
+   * @export
    * @param {string} url
    */
   preload(url) {
@@ -197,14 +250,14 @@ class VTAugment {
       return;
     }
 
-    if (!lscache.get(url)) {
-      lscache.set(url, 'fetching', 1);
+    if (!this.cache.get(url)) {
+      this.cache.set(url, 'fetching');
       this.getHtmlAjax_(url);
     }
   }
 
   /**
-   * @public
+   * @export
    * @return {!VTAugment}
    */
   openDrawer() {
@@ -213,7 +266,7 @@ class VTAugment {
   }
 
   /**
-   * @public
+   * @export
    * @return {!VTAugment}
    */
   closeDrawer() {
@@ -222,11 +275,11 @@ class VTAugment {
   }
 
   /**
-   * @private
+   * @export
    * @param {boolean} active
    * @return {!VTAugment}
    */
-  loading_(active) {
+  loading(active) {
     const spinner = this.getSpinner_(this.container);
     const iframe = this.container.querySelector('iframe');
 
@@ -318,11 +371,13 @@ class VTAugment {
     xmlhr.onreadystatechange = () => {
       if (xmlhr.readyState === XMLHttpRequest.DONE) {
         if (xmlhr.status === 200) {
-          lscache.set(url, xmlhr.response, 60);
-          this.loading_(false);
+          this.cache.set(url, xmlhr.response);
         } else {
-          lscache.remove(url);
+          this.loading(false);
+          this.cache.remove(url);
         }
+      } else {
+        this.loading(false);
       }
     };
 
@@ -339,13 +394,13 @@ class VTAugment {
 
       switch (message) {
         case 'VTAUGMENT:READY':
-          this.loading_(false);
+          this.loading(false);
           break;
         case 'VTAUGMENT:CLOSE':
           this.closeDrawer();
           break;
         case 'VTAUGMENT:CLEAR_CACHE':
-          lscache.flush();
+          this.cache.flush();
           break;
         default:
       }
@@ -369,3 +424,4 @@ class VTAugment {
 }
 
 exports = {VTAugment};
+window['VTAugment'] = VTAugment;
