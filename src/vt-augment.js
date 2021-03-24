@@ -191,6 +191,8 @@ class VTAugment {
   load(url) {
     if (!url) return this;
 
+    this.clean_();
+
     const safeUrl = this.safeUrl_(url);
 
     // iframe html injection not supported, fallback traditional url load
@@ -315,11 +317,7 @@ class VTAugment {
       frameborder: 0,
     };
 
-    let iframe = /** @type {?HTMLIFrameElement} */ (
-        container.querySelector('iframe'));
-    if (iframe) {
-      iframe.parentNode.removeChild(iframe);
-    }
+    this.clean_();
 
     const temp = document.createElement('div');
     temp.style.display = 'none';
@@ -340,6 +338,18 @@ class VTAugment {
           'sandbox', 'allow-scripts allow-same-origin allow-popups');
 
       container.appendChild(temp.removeChild(temp.firstChild));
+    }
+  }
+
+  /**
+   * @private
+   * @return {void}
+   */
+  clean_() {
+    let iframe = /** @type {?HTMLIFrameElement} */ (
+        this.container.querySelector('iframe'));
+    if (iframe) {
+      iframe.parentNode.removeChild(iframe);
     }
   }
 
