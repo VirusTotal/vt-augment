@@ -20,38 +20,15 @@
 * [Api](#api)
 * [License](#license)
 
-# Installation
-
-## Npm
-
-```sh
-npm i @virustotal/vt-augment
-```
-
-## Clone
-
-```sh
-git clone https://github.com/VirusTotal/vt-augment
-cd vt-augment
-npm install
-npm start
-```
-
-# Compatibility
-
-## Browsers
-
-VT Augment is compatible with all modern browsers and IE11.
-
 # Usage
 
 **VT Augment is bundled using the UMD format (@`dist/vt-augment.min.js`).**
 
-## Import
+Download the last version found in the `dist` folder and add to your static files.
 
 ```html
-<!--- "vtaugment" will be attached to the global window object. -->
-<script src="dist/vt-augment.min.js"></script>
+<!--- "VTAugment" will be attached to the global window object. -->
+<script src="vt-augment.min.js"></script>
 ```
 
 ## Code
