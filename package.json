@@ -1,6 +1,6 @@
 {
     "name": "@virustotal/vt-augment",
-    "version": "1.5.1",
+    "version": "1.5.2",
     "description": "Client library that wraps common patterns when interact with the Virustotal Augment product",
     "keywords": [
         "virustotal",
