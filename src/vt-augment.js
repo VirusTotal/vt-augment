@@ -98,6 +98,12 @@ const CSS_STYLESHEET = `
       display: none;
     }
   }
+  @media screen and (max-width: 700px) {
+    .vt-augment.drawer {
+      width:100%;
+      height: 100%;
+    }
+  }
 `;
 
 
