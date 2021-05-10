@@ -60,7 +60,7 @@ Creates a new object with a html element and a set of options. An iframe is dyna
 
 *Methods can be chained and can be called in whatever order.*
 
-| [load](#loadurl-string) | [preload](#preloadurl-string) | [openDrawer](#opendrawer) | [closeDrawer](#closedrawer) | [listen](#listenevent-string-callback-any) | [loading](#loading(active-boolean))
+| [load](#loadurl-string) | [preload](#preloadurl-string) | [openDrawer](#opendrawer) | [closeDrawer](#closedrawer) | [loading](#loading(active-boolean))
 |-----|-----|-----|-----|-----|-----|
 
 #### load(url: string)
