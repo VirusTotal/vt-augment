@@ -100,8 +100,7 @@ const CSS_STYLESHEET = `
   }
   @media screen and (max-width: 700px) {
     .vt-augment.drawer {
-      width:100%;
-      height: 100%;
+      width: 100%;
     }
   }
 `;
@@ -214,16 +213,13 @@ class VTAugment {
     // html not found in cache neither in fetching process, try to preload it
     if (!html) {
       this.loading(true);
-      this.createIframe_(this.container, safeUrl, undefined);
-      this.getHtmlAjax_(url);
-
-      return this;
+      this.preload(url);
     }
 
     // html is ready for the iframe injection
     if (html !== 'fetching') {
-      this.loading(false);
       this.createIframe_(this.container, undefined, html);
+      this.loading(false);
 
       return this;
     }
