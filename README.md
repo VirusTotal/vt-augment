@@ -3,7 +3,7 @@
 </h1>
 
 <h4 align="center">
-	Client library that wraps common patterns when interact with the <a href="https://developers.virustotal.com/v3.0/reference?#widget-overview">VirusTotal Augment product<a>.
+	Client library that wraps common patterns when interacting with the <a href="https://developers.virustotal.com/v3.0/reference?#widget-overview">VirusTotal Augment product<a>.
 </h4>
 
 <h4 align="center">
@@ -15,20 +15,21 @@
 # Table of Contents
 
 * [Installation](#installation)
-* [Compatibility](#compatibility)
 * [Usage](#usage)
-* [Api](#api)
-* [License](#license)
+* [API](#api)
+
+# Installation
+```bash
+npm i @virustotal/vt-augment --save
+```
 
 # Usage
 
 **VT Augment is bundled using the UMD format (@`dist/vt-augment.min.js`).**
 
-Download the last version found in the `dist` folder and add to your static files.
-
 ```html
 <!--- "VTAugment" will be attached to the global window object. -->
-<script src="vt-augment.min.js"></script>
+<script src="./node_modules/@virustotal/vt-augment/dist/vt-augment.min.js"></script>
 ```
 
 ## Code
@@ -61,7 +62,7 @@ Creates a new object with a html element and a set of options. An iframe is dyna
 *Methods can be chained and can be called in whatever order.*
 
 | [load](#loadurl-string) | [preload](#preloadurl-string) | [openDrawer](#opendrawer) | [closeDrawer](#closedrawer) | [loading](#loading(active-boolean))
-|-----|-----|-----|-----|-----|-----|
+|-----|-----|-----|-----|-----|
 
 #### load(url: string)
 
