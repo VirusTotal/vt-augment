@@ -2,6 +2,7 @@
     "name": "@virustotal/vt-augment",
     "version": "1.5.3",
     "description": "Client library that wraps common patterns when interact with the VirusTotal Augment product",
+    "main": "dist/vt-augment.min.js",
     "keywords": [
         "virustotal",
         "malware",
@@ -19,8 +20,8 @@
         "build": "gulp && npm run size",
         "size": "ls -hl dist/ | awk 'FNR == 2 {print $5}'"
     },
-    "author": "",
-    "license": "",
+    "author": "VirusTotal team",
+    "license": "MIT",
     "devDependencies": {
         "google-closure-compiler": "^20210302.0.0",
         "google-closure-library": "^20210302.0.0",
