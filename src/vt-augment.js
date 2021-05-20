@@ -208,27 +208,17 @@ class VTAugment {
       return this;
     }
 
-    let html = this.cache.get(url);
-
     // html not found in cache neither in fetching process, try to preload it
-    if (!html) {
+    if (!this.getHtml_(url)) {
       this.loading(true);
       this.preload(url);
     }
 
-    // html is ready for the iframe injection
-    if (html !== 'fetching') {
-      this.createIframe_(this.container, undefined, html);
-      this.loading(false);
-
-      return this;
-    }
-
     // html is still fetching so polling until it is ready
-    if (html === 'fetching') {
+    if (this.getHtml_(url) === 'fetching') {
       this.loading(true);
       const intervalRef = setInterval(() => {
-        html = this.cache.get(url);
+        const html = this.getHtml_(url);
 
         if (html && html !== 'fetching') {
           clearInterval(intervalRef);
@@ -239,6 +229,10 @@ class VTAugment {
           this.createIframe_(this.container, safeUrl, undefined);
         }
       }, 200);
+    // html is ready for the iframe injection
+    } else {
+      this.createIframe_(this.container, undefined, this.getHtml_(url));
+      this.loading(false);
     }
 
     return this;
@@ -294,6 +288,15 @@ class VTAugment {
     }
 
     return this;
+  }
+
+  /**
+   * @private
+   * @param {string} url
+   * @return {!string|undefined}
+   */
+  getHtml_(url) {
+    return this.cache.get(url);
   }
 
   /**
