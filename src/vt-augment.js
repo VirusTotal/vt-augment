@@ -397,6 +397,7 @@ class VTAugment {
     };
 
     xmlhr.open('GET', url, true);
+    xmlhr.withCredentials = true;
     xmlhr.send();
   }
 
