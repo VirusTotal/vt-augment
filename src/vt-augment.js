@@ -32,6 +32,7 @@ goog.module('vtaugment');
 
 const Const = goog.require('goog.string.Const');
 const SafeHtml = goog.require('goog.html.SafeHtml');
+const SafeUrl = goog.require('goog.html.SafeUrl');
 const SafeStyleSheet = goog.require('goog.html.SafeStyleSheet');
 const TrustedResourceUrl = goog.require('goog.html.TrustedResourceUrl');
 const {installSafeStyleSheet} = goog.require('goog.style');
@@ -105,65 +106,14 @@ const CSS_STYLESHEET = `
   }
 `;
 
-
-/**
- * Internal cache to store iframe html content.
- * @private
- */
-class Cache {
-  constructor() {
-    this.store = new Map();
-  }
-
-  /**
-   * @public
-   * @param {string} key
-   * @return {!string|undefined}
-   */
-  get(key) {
-    return this.store.get(key);
-  }
-
-  /**
-   * @public
-   * @param {string} key
-   * @param {!Object|null|string} value
-   * @return {void}
-   */
-  set(key, value) {
-    this.store.set(key, value);
-  }
-
-  /**
-   * @public
-   * @param {string} key
-   * @return {boolean}
-   */
-  remove(key) {
-    return this.store.delete(key);
-  }
-
-  /**
-   * @public
-   * @return {void}
-   */
-  flush() {
-    this.store = new Map();
-  }
-}
-
-
 class VTAugment {
   /**
    * @param {!Element} container
    * @param {?Options} options
    */
   constructor(container, options) {
-    this.cache = new Cache();
     this.container = container;
     this.options = options || {};
-    this.isSrcdocSupported = !!('srcdoc' in document.createElement('iframe'))
-        && SafeHtml.canUseSandboxIframe();
 
     this.createStyleSheet_();
 
@@ -196,44 +146,10 @@ class VTAugment {
   load(url) {
     if (!url) return this;
 
-    this.clean_();
-
     const safeUrl = this.safeUrl_(url);
-
-    // iframe html injection not supported, fallback traditional url load
-    if (!this.isSrcdocSupported) {
-      this.loading(true);
-      this.createIframe_(this.container, safeUrl, undefined);
-
-      return this;
-    }
-
-    // html not found in cache neither in fetching process, try to preload it
-    if (!this.getHtml_(url)) {
-      this.loading(true);
-      this.preload(url);
-    }
-
-    // html is still fetching so polling until it is ready
-    if (this.getHtml_(url) === 'fetching') {
-      this.loading(true);
-      const intervalRef = setInterval(() => {
-        const html = this.getHtml_(url);
-
-        if (html && html !== 'fetching') {
-          clearInterval(intervalRef);
-          this.createIframe_(this.container, undefined, html);
-          this.loading(false);
-        } else if (html === null) {
-          clearInterval(intervalRef);
-          this.createIframe_(this.container, safeUrl, undefined);
-        }
-      }, 200);
-    // html is ready for the iframe injection
-    } else {
-      this.createIframe_(this.container, undefined, this.getHtml_(url));
-      this.loading(false);
-    }
+    this.clean_();
+    this.loading(true);
+    this.createIframe_(this.container, safeUrl);
 
     return this;
   }
@@ -243,15 +159,7 @@ class VTAugment {
    * @param {string} url
    */
   preload(url) {
-    // Avoid caching if browser doesn't support iframe content injection
-    if (!this.isSrcdocSupported) {
-      return;
-    }
-
-    if (!this.cache.get(url)) {
-      this.cache.set(url, 'fetching');
-      this.getHtmlAjax_(url);
-    }
+    return this;
   }
 
   /**
@@ -292,15 +200,6 @@ class VTAugment {
 
   /**
    * @private
-   * @param {string} url
-   * @return {!string|undefined}
-   */
-  getHtml_(url) {
-    return this.cache.get(url);
-  }
-
-  /**
-   * @private
    */
   createStyleSheet_() {
     const styleNode = document.createElement('style');
@@ -312,31 +211,21 @@ class VTAugment {
   /**
    * @private
    * @param {!Element} container
-   * @param {!TrustedResourceUrl|undefined} safeUrl
-   * @param {string|undefined} html
+   * @param {!goog.html.SafeUrl|undefined} safeUrl
    * @return {void}
    */
-  createIframe_(container, safeUrl, html) {
+  createIframe_(container, safeUrl) {
     const iframeAttrs = {
       style: {width: '100%', height: '100%', border: '0'},
       frameborder: 0,
     };
 
-    this.clean_();
-
-    const temp = document.createElement('div');
-    temp.style.display = 'none';
-
     if (safeUrl) {
-      const iframe = SafeHtml.createIframe(safeUrl, undefined, iframeAttrs);
+      const temp = document.createElement('div');
+      temp.style.display = 'none';
 
-      setInnerHtml(temp, iframe);
-      temp.firstChild.removeAttribute('sandbox');
-
-      container.appendChild(temp.removeChild(temp.firstChild));
-    } else {
       const sandboxedIframe = SafeHtml.createSandboxIframe(
-          undefined, html, iframeAttrs);
+          safeUrl, undefined, iframeAttrs);
 
       setInnerHtml(temp, sandboxedIframe);
       temp.firstChild.setAttribute(
@@ -378,31 +267,6 @@ class VTAugment {
 
   /**
    * @private
-   * @param {string} url
-   */
-  getHtmlAjax_(url) {
-    const xmlhr = new XMLHttpRequest();
-
-    xmlhr.onreadystatechange = () => {
-      if (xmlhr.readyState === XMLHttpRequest.DONE) {
-        if (xmlhr.status === 200) {
-          this.cache.set(url, xmlhr.response);
-        } else {
-          this.loading(false);
-          this.cache.remove(url);
-        }
-      } else {
-        this.loading(false);
-      }
-    };
-
-    xmlhr.open('GET', url, true);
-    xmlhr.withCredentials = true;
-    xmlhr.send();
-  }
-
-  /**
-   * @private
    * @param {!MessageEvent} messageEvent
    */
   processMessageEvent_(messageEvent) {
@@ -416,7 +280,8 @@ class VTAugment {
           this.closeDrawer();
           break;
         case 'VTAUGMENT:CLEAR_CACHE':
-          this.cache.flush();
+          var iframe = this.container.querySelector('iframe');
+          if (iframe) iframe.src = iframe.src;
           break;
         default:
       }
@@ -425,17 +290,17 @@ class VTAugment {
   /**
    * @private
    * @param {string} url
-   * @return {!TrustedResourceUrl}
+   * @return {!goog.html.SafeUrl}
    */
   safeUrl_(url) {
     const token = url.split('/').pop();
-    const safeVTUrl =
+    const vtUrl =
       Const.from('https://www.virustotal.com/ui/widget/html/%{token}');
-    const safeUrl = TrustedResourceUrl.format(safeVTUrl, {
+    const trustedUrl = TrustedResourceUrl.format(vtUrl, {
       'token': token,
     });
 
-    return safeUrl;
+    return SafeUrl.fromTrustedResourceUrl(trustedUrl);
   }
 }
 
