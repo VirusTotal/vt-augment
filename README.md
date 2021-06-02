@@ -61,8 +61,8 @@ Creates a new object with a html element and a set of options. An iframe is dyna
 
 *Methods can be chained and can be called in whatever order.*
 
-| [load](#loadurl-string) | [preload](#preloadurl-string) | [openDrawer](#opendrawer) | [closeDrawer](#closedrawer) | [loading](#loading(active-boolean))
-|-----|-----|-----|-----|-----|
+| [load](#loadurl-string) | [openDrawer](#opendrawer) | [closeDrawer](#closedrawer) | [loading](#loading(active-boolean))
+|-----|-----|-----|-----|
 
 #### load(url: string)
 
@@ -74,15 +74,6 @@ vtaugment.load("...")
 // Additionally, if the mode is `drawer` can be used along with the method `openDrawer`
 
 vtaugment.load("...").openDrawer()
-
-```
-
-#### preload(url: string)
-
-Load the html and cache it ready to show the content as soon as you call the `load` method. Typically this method is used linked to a `mouseover` event in the link or the surrounded area of the link.
-
-```js
-vtaugment.preload("...")
 
 ```
 
