@@ -211,7 +211,7 @@ class VTAugment {
   /**
    * @private
    * @param {!Element} container
-   * @param {!goog.html.SafeUrl|undefined} safeUrl
+   * @param {!SafeUrl|undefined} safeUrl
    * @return {void}
    */
   createIframe_(container, safeUrl) {
@@ -280,8 +280,9 @@ class VTAugment {
           this.closeDrawer();
           break;
         case 'VTAUGMENT:CLEAR_CACHE':
-          var iframe = this.container.querySelector('iframe');
-          if (iframe) iframe.src = iframe.src;
+          const iframe = /** @type {?HTMLIFrameElement} */ (
+              this.container.querySelector('iframe'));
+          if (iframe) this.load(iframe.src);
           break;
         default:
       }
@@ -290,7 +291,7 @@ class VTAugment {
   /**
    * @private
    * @param {string} url
-   * @return {!goog.html.SafeUrl}
+   * @return {!SafeUrl}
    */
   safeUrl_(url) {
     const token = url.split('/').pop();
