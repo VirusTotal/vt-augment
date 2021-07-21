@@ -42,6 +42,7 @@ const {setInnerHtml} = goog.require('goog.dom.safe');
  * @typedef {{
  *            background:string,
  *            mode:string,
+ *            closingFromOutside:boolean,
  *          }}
  */
 let Options;
@@ -106,6 +107,13 @@ const CSS_STYLESHEET = `
   }
 `;
 
+/** @type {Options} */
+const DEFAULT_OPTIONS = {
+  'mode': 'drawer',
+  'background': '',
+  'closingFromOutside': true,
+}
+
 class VTAugment {
   /**
    * @param {!Element} container
@@ -113,7 +121,7 @@ class VTAugment {
    */
   constructor(container, options) {
     this.container = container;
-    this.options = options || {};
+    this.options = this.getOptions_(options);
 
     this.createStyleSheet_();
 
@@ -123,15 +131,17 @@ class VTAugment {
       this.container.style.background = this.options.background;
     }
 
-    if (!this.options.mode || this.options.mode === 'drawer') {
+    if (this.options.mode === 'drawer') {
       this.container.classList.add('drawer');
     }
 
-    document.body.addEventListener('click', e => {
-      if (e.target !== this.container) {
-        this.closeDrawer();
-      }
-    });
+    if (this.options.closingFromOutside) {
+      document.body.addEventListener('click', e => {
+        if (e.target !== this.container) {
+          this.closeDrawer();
+        }
+      });
+    }
 
     window.addEventListener('message', (event) => {
       this.processMessageEvent_(/** @type {!MessageEvent} */ (event));
@@ -322,6 +332,23 @@ class VTAugment {
     });
 
     return SafeUrl.fromTrustedResourceUrl(trustedUrl);
+  }
+
+  /**
+   * @private
+   * @param {Options} options defined by the user
+   * @return {!Options}
+   */
+  getOptions_(userOptions) {
+    let options = {...DEFAULT_OPTIONS};
+
+    for (const key of Object.keys(userOptions)) {
+      if (options.hasOwnProperty(key)) {
+        options[key] = userOptions[key];
+      }
+    }
+
+    return options;
   }
 }
 
