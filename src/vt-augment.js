@@ -49,6 +49,7 @@ let Options;
 /** @type {string} */
 const CSS_STYLESHEET = `
   .vt-augment {
+    display: flex;
     justify-content: center;
     align-items: center;
   }
