@@ -40,9 +40,9 @@ const {setInnerHtml} = goog.require('goog.dom.safe');
 
 /**
  * @typedef {{
- *            background:string,
- *            mode:string,
- *            closingFromOutside:boolean,
+ *            background: (string|undefined),
+ *            mode: (string|undefined),
+ *            closingFromOutside: (boolean|undefined),
  *          }}
  */
 let Options;
@@ -122,22 +122,23 @@ class VTAugment {
    * @param {?Options} options
    */
   constructor(container, options) {
+    if (!container) throw new Error('Missing container, a valid dom element is required');
     this.container = container;
-    this.options = this.getOptions_(options);
+    this.options = this.getOptions_(options || {});
 
     this.createStyleSheet_();
 
     this.container.classList.add('vt-augment');
 
-    if (this.options.background) {
-      this.container.style.background = this.options.background;
+    if (this.options['background']) {
+      this.container.style.background = this.options['background'];
     }
 
-    if (this.options.mode === 'drawer') {
+    if (this.options['mode'] === 'drawer') {
       this.container.classList.add('drawer');
     }
 
-    if (this.options.closingFromOutside) {
+    if (this.options['closingFromOutside']) {
       document.body.addEventListener('click', e => {
         if (e.target !== this.container) {
           this.closeDrawer();
@@ -242,8 +243,8 @@ class VTAugment {
       'title': "VirusTotal Augment",
     };
 
-    if (this.options.mode === 'standalone') {
-      iframeAttrs['name'] = this.options.mode;
+    if (this.options['mode'] === 'standalone') {
+      iframeAttrs['name'] = this.options['mode'];
     }
 
     if (safeUrl) {
@@ -338,16 +339,18 @@ class VTAugment {
 
   /**
    * @private
-   * @param {Options} options defined by the user
+   * @param {!Options} userOptions
    * @return {!Options}
    */
   getOptions_(userOptions) {
     let options = {...DEFAULT_OPTIONS};
 
-    for (const key of Object.keys(userOptions)) {
-      if (options.hasOwnProperty(key)) {
-        options[key] = userOptions[key];
-      }
+    if (userOptions) {
+      Object.keys(userOptions).map((key) => {
+        if (options.hasOwnProperty(key)) {
+          options[key] = userOptions[key];
+        }
+      });
     }
 
     return options;
