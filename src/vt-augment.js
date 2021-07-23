@@ -168,7 +168,9 @@ class VTAugment {
    * @return {!VTAugment}
    */
   openDrawer() {
+    const iframe = this.container.querySelector('iframe');
     this.container.setAttribute('opened', '');
+    iframe && iframe.removeAttribute('tabindex');
     return this;
   }
 
@@ -177,7 +179,12 @@ class VTAugment {
    * @return {!VTAugment}
    */
   closeDrawer() {
+    const iframe = this.container.querySelector('iframe');
     this.container.removeAttribute('opened');
+    if (iframe) {
+      iframe.setAttribute('tabindex', '-1');
+      iframe.style.display = 'none';
+    }
     return this;
   }
 
@@ -194,6 +201,7 @@ class VTAugment {
 
     if (iframe) {
       iframe.style.display = active ? 'none' : 'block';
+      iframe.focus();
     }
 
     return this;
@@ -217,9 +225,15 @@ class VTAugment {
    */
   createIframe_(container, safeUrl) {
     const iframeAttrs = {
-      style: {width: '100%', height: '100%', border: '0'},
-      frameborder: 0,
+      'style': {width: '100%', height: '100%', border: '0'},
+      'frameborder': 0,
+      'tabIndex': "-1",
+      'title': "VirusTotal Augment",
     };
+
+    if (this.options.mode === 'standalone') {
+      iframeAttrs['name'] = this.options.mode;
+    }
 
     if (safeUrl) {
       const temp = document.createElement('div');
@@ -271,6 +285,12 @@ class VTAugment {
    * @param {!MessageEvent} messageEvent
    */
   processMessageEvent_(messageEvent) {
+      if (messageEvent.source !==
+          this.container.querySelector('iframe')?.contentWindow) {
+        // The event originated in an iframe not controlled by this instance.
+        return;
+      }
+
       const message = messageEvent.data;
 
       switch (message) {

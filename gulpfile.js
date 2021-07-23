@@ -8,7 +8,7 @@ gulp.task('default', function() {
         src('./src/**/*.js').
         pipe(closureCompiler({
             compilation_level: 'ADVANCED',
-            language_in: 'ECMASCRIPT_2015',
+            language_in: 'ECMASCRIPT_2020',
             language_out: 'ECMASCRIPT5',
             warning_level: 'VERBOSE',
             js_output_file: 'dist/vt-augment.min.js',
