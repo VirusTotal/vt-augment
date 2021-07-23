@@ -49,7 +49,7 @@ let Options;
 /** @type {string} */
 const CSS_STYLESHEET = `
   .vt-augment {
-    display: flex;
+    display: none;
     justify-content: center;
     align-items: center;
   }
@@ -68,6 +68,7 @@ const CSS_STYLESHEET = `
     transform: translateX(100vw);
   }
   .vt-augment.drawer[opened] {
+    display: flex;
     animation: slideFromRight 0.2s 1 forwards;
   }
   .vt-augment > .spinner {
