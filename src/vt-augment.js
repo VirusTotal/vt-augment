@@ -49,11 +49,11 @@ let Options;
 /** @type {string} */
 const CSS_STYLESHEET = `
   .vt-augment {
-    display: none;
     justify-content: center;
     align-items: center;
   }
   .vt-augment.drawer {
+    display: none;
     width: 700px;
     background: white;
     border: 1px solid #e6e6e6;
