@@ -55,6 +55,7 @@ const CSS_STYLESHEET = `
     align-items: center;
   }
   .vt-augment.drawer {
+    display: none;
     width: 700px;
     background: white;
     border: 1px solid #e6e6e6;
@@ -69,6 +70,7 @@ const CSS_STYLESHEET = `
     transform: translateX(100vw);
   }
   .vt-augment.drawer[opened] {
+    display: flex;
     animation: slideFromRight 0.2s 1 forwards;
   }
   .vt-augment > .spinner {
