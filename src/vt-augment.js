@@ -40,8 +40,9 @@ const {setInnerHtml} = goog.require('goog.dom.safe');
 
 /**
  * @typedef {{
- *            background:string,
- *            mode:string,
+ *            background: (string|undefined),
+ *            mode: (string|undefined),
+ *            closingFromOutside: (boolean|undefined),
  *          }}
  */
 let Options;
@@ -108,32 +109,42 @@ const CSS_STYLESHEET = `
   }
 `;
 
+/** @type {Options} */
+const DEFAULT_OPTIONS = {
+  'mode': 'drawer',
+  'background': '',
+  'closingFromOutside': true,
+}
+
 class VTAugment {
   /**
    * @param {!Element} container
    * @param {?Options} options
    */
   constructor(container, options) {
+    if (!container) throw new Error('Missing container, a valid dom element is required');
     this.container = container;
-    this.options = options || {};
+    this.options = this.getOptions_(options || {});
 
     this.createStyleSheet_();
 
     this.container.classList.add('vt-augment');
 
-    if (this.options.background) {
-      this.container.style.background = this.options.background;
+    if (this.options['background']) {
+      this.container.style.background = this.options['background'];
     }
 
-    if (!this.options.mode || this.options.mode === 'drawer') {
+    if (this.options['mode'] === 'drawer') {
       this.container.classList.add('drawer');
     }
 
-    document.body.addEventListener('click', e => {
-      if (e.target !== this.container) {
-        this.closeDrawer();
-      }
-    });
+    if (this.options['closingFromOutside']) {
+      document.body.addEventListener('click', e => {
+        if (e.target !== this.container) {
+          this.closeDrawer();
+        }
+      });
+    }
 
     window.addEventListener('message', (event) => {
       this.processMessageEvent_(/** @type {!MessageEvent} */ (event));
@@ -232,8 +243,8 @@ class VTAugment {
       'title': "VirusTotal Augment",
     };
 
-    if (this.options.mode === 'standalone') {
-      iframeAttrs['name'] = this.options.mode;
+    if (this.options['mode'] === 'standalone') {
+      iframeAttrs['name'] = this.options['mode'];
     }
 
     if (safeUrl) {
@@ -324,6 +335,25 @@ class VTAugment {
     });
 
     return SafeUrl.fromTrustedResourceUrl(trustedUrl);
+  }
+
+  /**
+   * @private
+   * @param {!Options} userOptions
+   * @return {!Options}
+   */
+  getOptions_(userOptions) {
+    let options = {...DEFAULT_OPTIONS};
+
+    if (userOptions) {
+      Object.keys(userOptions).map((key) => {
+        if (options.hasOwnProperty(key)) {
+          options[key] = userOptions[key];
+        }
+      });
+    }
+
+    return options;
   }
 }
 
