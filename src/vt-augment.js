@@ -50,6 +50,7 @@ let Options;
 /** @type {string} */
 const CSS_STYLESHEET = `
   .vt-augment {
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -109,9 +110,12 @@ const CSS_STYLESHEET = `
   }
 `;
 
+const DRAWER_MODE = 'drawer';
+const STANDALONE_MODE = 'standalone';
+
 /** @type {Options} */
 const DEFAULT_OPTIONS = {
-  'mode': 'drawer',
+  'mode': DRAWER_MODE,
   'background': '',
   'closingFromOutside': true,
 }
@@ -134,8 +138,8 @@ class VTAugment {
       this.container.style.background = this.options['background'];
     }
 
-    if (this.options['mode'] === 'drawer') {
-      this.container.classList.add('drawer');
+    if (this.options['mode'] === DRAWER_MODE) {
+      this.container.classList.add(DRAWER_MODE);
     }
 
     if (this.options['closingFromOutside']) {
@@ -180,9 +184,11 @@ class VTAugment {
    * @return {!VTAugment}
    */
   openDrawer() {
-    const iframe = this.container.querySelector('iframe');
-    this.container.setAttribute('opened', '');
-    iframe && iframe.removeAttribute('tabindex');
+    if (this.options['mode'] === DRAWER_MODE) {
+      const iframe = this.container.querySelector('iframe');
+      this.container.setAttribute('opened', '');
+      iframe && iframe.removeAttribute('tabindex');
+    }
     return this;
   }
 
@@ -191,11 +197,13 @@ class VTAugment {
    * @return {!VTAugment}
    */
   closeDrawer() {
-    const iframe = this.container.querySelector('iframe');
-    this.container.removeAttribute('opened');
-    if (iframe) {
-      iframe.setAttribute('tabindex', '-1');
-      iframe.style.display = 'none';
+    if (this.options['mode'] === DRAWER_MODE) {
+      const iframe = this.container.querySelector('iframe');
+      this.container.removeAttribute('opened');
+      if (iframe) {
+        iframe.setAttribute('tabindex', '-1');
+        iframe.style.display = 'none';
+      }
     }
     return this;
   }
@@ -243,7 +251,7 @@ class VTAugment {
       'title': "VirusTotal Augment",
     };
 
-    if (this.options['mode'] === 'standalone') {
+    if (this.options['mode'] === STANDALONE_MODE) {
       iframeAttrs['name'] = this.options['mode'];
     }
 

@@ -47,13 +47,17 @@ vtaugment.load("[url]").openDrawer()
 
 ## Modes
 
-#### Drawer
+### Drawer
 
-This is the default mode, VT Augment will be shown in a right side panel.
+This is the default mode, VT Augment will be shown in a right side panel when the `openDrawer` method is called.
+
+### Standalone
+
+This mode allows you to integrate the widget as a non-animated div in your page. See [Options](#options).
 
 # API
 
-#### vtaugment(container = null, opts = {})
+### vtaugment(container = null, opts = {})
 
 Creates a new object with a html element and a set of options. An iframe is dynamically created inside the container to host the VT API response.
 
@@ -108,6 +112,11 @@ vtaugment.loading(true)
 
 ```js
 {
-    background: '#fff', // Background color for loading states
+  // Background color for loading states. Default ''.
+  background: '#fff',
+  // Force to closing the widget only with the X button. Default true.
+  closingFromOutside: true | false,
+  // Select the widget mode. Default drawer.
+  mode: 'drawer' | 'standalone',
 }
 ```
