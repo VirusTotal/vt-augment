@@ -3,7 +3,8 @@
 </h1>
 
 <h4 align="center">
-	Client library that wraps common patterns when interacting with the <a href="https://developers.virustotal.com/v3.0/reference?#widget-overview">VirusTotal Augment widget<a>.
+	Client library that wraps common patterns when interacting with the 
+	<a href="https://docs.virustotal.com/reference/widget-overview">VirusTotal Augment widget<a>.
 </h4>
 
 <h4 align="center">
