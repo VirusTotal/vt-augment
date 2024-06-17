@@ -164,18 +164,25 @@ class VTAugment {
     if (!url) return this;
 
     const safeUrl = this.safeUrl_(url);
-    this.clean_();
     this.loading(true);
-    this.createIframe_(this.container, safeUrl);
+    const iframe = this.container.querySelector('iframe');
+    if (iframe) {
+      iframe.src = SafeUrl.unwrap(safeUrl);
+    } else {
+      this.createIframe_(this.container, safeUrl);
+    }
 
     return this;
   }
 
   /**
    * @export
-   * @param {string} url
+   * @return {!VTAugment}
    */
-  preload(url) {
+  reload() {
+    this.loading(true);
+    const iframe = this.container.querySelector('iframe');
+    iframe.src = iframe.src
     return this;
   }
 
@@ -273,18 +280,6 @@ class VTAugment {
 
   /**
    * @private
-   * @return {void}
-   */
-  clean_() {
-    let iframe = /** @type {?HTMLIFrameElement} */ (
-        this.container.querySelector('iframe'));
-    if (iframe) {
-      iframe.parentNode.removeChild(iframe);
-    }
-  }
-
-  /**
-   * @private
    * @param {!Element} container
    * @return {!Element}
    */
@@ -322,9 +317,8 @@ class VTAugment {
           this.closeDrawer();
           break;
         case 'VTAUGMENT:CLEAR_CACHE':
-          const iframe = /** @type {?HTMLIFrameElement} */ (
-              this.container.querySelector('iframe'));
-          if (iframe) this.load(iframe.src);
+        case 'VTAUGMENT:RELOAD':
+          this.reload();
           break;
         default:
       }
