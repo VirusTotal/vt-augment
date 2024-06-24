@@ -1,6 +1,6 @@
 {
     "name": "@virustotal/vt-augment",
-    "version": "1.7.2",
+    "version": "1.7.3",
     "description": "Client library that wraps common patterns when interact with the VirusTotal Augment product",
     "main": "dist/vt-augment.min.js",
     "keywords": [
