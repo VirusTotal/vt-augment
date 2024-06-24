@@ -271,7 +271,8 @@ class VTAugment {
 
       setInnerHtml(temp, sandboxedIframe);
       temp.firstChild.setAttribute(
-          'sandbox', 'allow-scripts allow-same-origin allow-popups' +
+          'sandbox', 'allow-forms allow-scripts' +
+          ' allow-same-origin allow-popups' +
           ' allow-storage-access-by-user-activation');
 
       container.appendChild(temp.removeChild(temp.firstChild));
