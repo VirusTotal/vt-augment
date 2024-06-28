@@ -167,22 +167,15 @@ class VTAugment {
     this.loading(true);
     const iframe = this.container.querySelector('iframe');
     if (iframe) {
-      iframe.src = SafeUrl.unwrap(safeUrl);
+      const eventMessage = {
+        'action': 'VTAUGMENT:IFRAME:LOAD',
+        'payload': SafeUrl.unwrap(safeUrl),
+      }
+      iframe.contentWindow.postMessage(eventMessage, '*');
     } else {
       this.createIframe_(this.container, safeUrl);
     }
 
-    return this;
-  }
-
-  /**
-   * @export
-   * @return {!VTAugment}
-   */
-  reload() {
-    this.loading(true);
-    const iframe = this.container.querySelector('iframe');
-    iframe.src = iframe.src
     return this;
   }
 
@@ -316,10 +309,6 @@ class VTAugment {
           break;
         case 'VTAUGMENT:CLOSE':
           this.closeDrawer();
-          break;
-        case 'VTAUGMENT:CLEAR_CACHE':
-        case 'VTAUGMENT:RELOAD':
-          this.reload();
           break;
         default:
       }
